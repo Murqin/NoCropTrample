@@ -1,0 +1,30 @@
+# Gradle
+.gradle/
+build/
+bin/
+out/
+
+# IDE/Editor
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.classpath
+.project
+
+# Fabric
+run/
+.fabric/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+crash-reports/
+
+# Cache
+.gemini/
