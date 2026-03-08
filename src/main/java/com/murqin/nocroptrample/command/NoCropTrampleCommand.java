@@ -16,10 +16,23 @@ public class NoCropTrampleCommand {
             CommandManager.literal("nocroptrample")
                 // /nocroptrample - show status
                 .executes(NoCropTrampleCommand::showStatus)
-                
+
+                // /nocroptrample empty [on|off]
+                .then(CommandManager.literal("empty")
+                    .executes(NoCropTrampleCommand::showEmptyStatus)
+                    .then(CommandManager.argument("state", StringArgumentType.word())
+                        .suggests((context, builder) -> {
+                            builder.suggest("on");
+                            builder.suggest("off");
+                            return builder.buildFuture();
+                        })
+                        .executes(context -> setEmptyState(context, StringArgumentType.getString(context,"state")))
+                    )
+                )
+
                 // /nocroptrample player [on|off]
                 .then(CommandManager.literal("player")
-                    .executes(context -> showPlayerStatus(context))
+                    .executes(NoCropTrampleCommand::showPlayerStatus)
                     .then(CommandManager.argument("state", StringArgumentType.word())
                         .suggests((context, builder) -> {
                             builder.suggest("on");
@@ -32,7 +45,7 @@ public class NoCropTrampleCommand {
                 
                 // /nocroptrample mob [on|off]
                 .then(CommandManager.literal("mob")
-                    .executes(context -> showMobStatus(context))
+                    .executes(NoCropTrampleCommand::showMobStatus)
                     .then(CommandManager.argument("state", StringArgumentType.word())
                         .suggests((context, builder) -> {
                             builder.suggest("on");
@@ -63,7 +76,16 @@ public class NoCropTrampleCommand {
                 .append(getStatusText(ModConfig.preventPlayerTrampling)), false);
         source.sendFeedback(() -> Text.literal("  §7Mob trampling prevention: ")
                 .append(getStatusText(ModConfig.preventMobTrampling)), false);
-        
+        source.sendFeedback(() -> Text.literal("  §7Empty farmland trampling prevention: ")
+                .append(getStatusText(ModConfig.preventEmptyTrampling)), false);
+
+        return 1;
+    }
+
+    private static int showEmptyStatus(CommandContext<ServerCommandSource> context) {
+        ServerCommandSource source = context.getSource();
+        source.sendFeedback(() -> Text.literal("§6[NoCropTrample] §7Empty farmland trampling prevention: ")
+                .append(getStatusText(ModConfig.preventEmptyTrampling)), false);
         return 1;
     }
 
@@ -78,6 +100,24 @@ public class NoCropTrampleCommand {
         ServerCommandSource source = context.getSource();
         source.sendFeedback(() -> Text.literal("§6[NoCropTrample] §7Mob trampling prevention: ")
                 .append(getStatusText(ModConfig.preventMobTrampling)), false);
+        return 1;
+    }
+
+    private static int setEmptyState(CommandContext<ServerCommandSource> context, String state) {
+        ServerCommandSource source = context.getSource();
+
+        if (!state.equalsIgnoreCase("on") && !state.equalsIgnoreCase("off")) {
+            source.sendError(Text.literal("§c[NoCropTrample] Invalid state! Use 'on' or 'off'."));
+            return 0;
+        }
+
+        boolean newState = state.equalsIgnoreCase("on");
+        ModConfig.preventEmptyTrampling = newState;
+        ModConfig.save();
+
+        source.sendFeedback(() -> Text.literal("§6[NoCropTrample] §7Empty farmland trampling prevention: ")
+                .append(getStatusText(newState)), true);
+
         return 1;
     }
 

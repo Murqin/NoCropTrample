@@ -13,14 +13,12 @@ public class ModMenuIntegration implements ModMenuApi {
     
     @Override
     public ConfigScreenFactory<?> getModConfigScreenFactory() {
-        return parent -> new NoCropTrampleConfigScreen(parent);
+        return NoCropTrampleConfigScreen::new;
     }
     
     public static class NoCropTrampleConfigScreen extends Screen {
         private final Screen parent;
-        private ButtonWidget playerButton;
-        private ButtonWidget mobButton;
-        
+
         public NoCropTrampleConfigScreen(Screen parent) {
             super(Text.literal("NoCropTrample Config"));
             this.parent = parent;
@@ -30,27 +28,38 @@ public class ModMenuIntegration implements ModMenuApi {
         protected void init() {
             int centerX = this.width / 2;
             int startY = this.height / 4;
-            
-            playerButton = ButtonWidget.builder(
-                    getPlayerButtonText(),
-                    button -> {
-                        ModConfig.preventPlayerTrampling = !ModConfig.preventPlayerTrampling;
-                        ModConfig.save();
-                        button.setMessage(getPlayerButtonText());
-                    })
-                .dimensions(centerX - 100, startY, 200, 20)
-                .build();
+
+            ButtonWidget emptyButton = ButtonWidget.builder(
+                            getEmptyButtonText(),
+                            button -> {
+                                ModConfig.preventEmptyTrampling = !ModConfig.preventEmptyTrampling;
+                                ModConfig.save();
+                                button.setMessage(getEmptyButtonText());
+                            })
+                    .dimensions(centerX - 100, startY, 200, 20)
+                    .build();
+            this.addDrawableChild(emptyButton);
+
+            ButtonWidget playerButton = ButtonWidget.builder(
+                            getPlayerButtonText(),
+                            button -> {
+                                ModConfig.preventPlayerTrampling = !ModConfig.preventPlayerTrampling;
+                                ModConfig.save();
+                                button.setMessage(getPlayerButtonText());
+                            })
+                    .dimensions(centerX - 100, startY, 200, 20)
+                    .build();
             this.addDrawableChild(playerButton);
-            
-            mobButton = ButtonWidget.builder(
-                    getMobButtonText(),
-                    button -> {
-                        ModConfig.preventMobTrampling = !ModConfig.preventMobTrampling;
-                        ModConfig.save();
-                        button.setMessage(getMobButtonText());
-                    })
-                .dimensions(centerX - 100, startY + 25, 200, 20)
-                .build();
+
+            ButtonWidget mobButton = ButtonWidget.builder(
+                            getMobButtonText(),
+                            button -> {
+                                ModConfig.preventMobTrampling = !ModConfig.preventMobTrampling;
+                                ModConfig.save();
+                                button.setMessage(getMobButtonText());
+                            })
+                    .dimensions(centerX - 100, startY + 25, 200, 20)
+                    .build();
             this.addDrawableChild(mobButton);
             
             this.addDrawableChild(ButtonWidget.builder(
@@ -59,7 +68,14 @@ public class ModMenuIntegration implements ModMenuApi {
                 .dimensions(centerX - 100, startY + 70, 200, 20)
                 .build());
         }
-        
+
+        private Text getEmptyButtonText() {
+            return Text.literal("Empty Trampling: ")
+                    .append(ModConfig.preventEmptyTrampling
+                        ? Text.literal("§aPrevented")
+                        : Text.literal("§cAllowed"));
+        }
+
         private Text getPlayerButtonText() {
             return Text.literal("Player Trampling: ")
                     .append(ModConfig.preventPlayerTrampling 

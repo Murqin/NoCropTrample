@@ -19,10 +19,10 @@ public class NoCropTrampleMod implements ModInitializer {
         ModConfig.load();
         
         // Register commands
-        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
-            NoCropTrampleCommand.register(dispatcher);
-        });
-        
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> NoCropTrampleCommand.register(dispatcher)
+        );
+
+        LOGGER.info("Empty trampling prevention: {}", ModConfig.preventEmptyTrampling ? "ON" : "OFF");
         LOGGER.info("Player trampling prevention: {}", ModConfig.preventPlayerTrampling ? "ON" : "OFF");
         LOGGER.info("Mob trampling prevention: {}", ModConfig.preventMobTrampling ? "ON" : "OFF");
     }

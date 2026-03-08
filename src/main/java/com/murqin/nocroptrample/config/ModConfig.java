@@ -18,15 +18,17 @@ public class ModConfig {
     // Config values
     public static boolean preventPlayerTrampling = true;
     public static boolean preventMobTrampling = true;
+    public static boolean preventEmptyTrampling = true;
 
     public static void load() {
         if (Files.exists(CONFIG_PATH)) {
             try {
-                String json = new String(Files.readAllBytes(CONFIG_PATH), java.nio.charset.StandardCharsets.UTF_8);
+                String json = Files.readString(CONFIG_PATH);
                 ConfigData data = GSON.fromJson(json, ConfigData.class);
                 if (data != null) {
                     preventPlayerTrampling = data.preventPlayerTrampling;
                     preventMobTrampling = data.preventMobTrampling;
+                    preventEmptyTrampling = data.preventEmptyTrampling;
                 }
                 NoCropTrampleMod.LOGGER.info("Config loaded from {}", CONFIG_PATH);
             } catch (IOException e) {
@@ -42,9 +44,10 @@ public class ModConfig {
             ConfigData data = new ConfigData();
             data.preventPlayerTrampling = preventPlayerTrampling;
             data.preventMobTrampling = preventMobTrampling;
+            data.preventEmptyTrampling = preventEmptyTrampling;
             
             Files.createDirectories(CONFIG_PATH.getParent());
-            Files.write(CONFIG_PATH, GSON.toJson(data).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            Files.writeString(CONFIG_PATH, GSON.toJson(data));
             NoCropTrampleMod.LOGGER.info("Config saved to {}", CONFIG_PATH);
         } catch (IOException e) {
             NoCropTrampleMod.LOGGER.error("Failed to save config", e);
@@ -53,6 +56,7 @@ public class ModConfig {
 
     // Inner class for JSON serialization
     private static class ConfigData {
+        boolean preventEmptyTrampling = true;
         boolean preventPlayerTrampling = true;
         boolean preventMobTrampling = true;
     }
