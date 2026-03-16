@@ -67,12 +67,12 @@ public class ModMenuIntegration implements ModMenuApi {
         }
 
         /**
-         * Toggles the player trampling prevention setting.
+         * Toggles the empty trampling prevention setting.
          *
          * @param button the button that was clicked
          */
         private void toggleEmptyTrampling(Button button) {
-            ModConfig.setPreventPlayerTrampling(!ModConfig.isPreventPlayerTrampling());
+            ModConfig.setPreventEmptyTrampling(!ModConfig.isPreventEmptyTrampling());
             button.setMessage(getEmptyButtonText());
         }
 
