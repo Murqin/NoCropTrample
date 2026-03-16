@@ -27,8 +27,6 @@ public class ModMenuIntegration implements ModMenuApi {
      */
     public static class NoCropTrampleConfigScreen extends Screen {
         private final Screen parent;
-        private Button playerButton;
-        private Button mobButton;
 
         public NoCropTrampleConfigScreen(Screen parent) {
             super(Component.literal("NoCropTrample Config"));
@@ -40,25 +38,42 @@ public class ModMenuIntegration implements ModMenuApi {
             int centerX = this.width / 2;
             int startY = this.height / 4;
 
-            playerButton = Button.builder(
+            Button emptyButton = Button.builder(
+                    getEmptyButtonText(),
+                    this::toggleEmptyTrampling)
+                    .bounds(centerX - 100, startY, 200, 20)
+                    .build();
+            this.addRenderableWidget(emptyButton);
+
+            Button playerButton = Button.builder(
                     getPlayerButtonText(),
                     this::togglePlayerTrampling)
-                    .bounds(centerX - 100, startY, 200, 20)
+                    .bounds(centerX - 100, startY + 25, 200, 20)
                     .build();
             this.addRenderableWidget(playerButton);
 
-            mobButton = Button.builder(
-                    getMobButtonText(),
-                    this::toggleMobTrampling)
-                    .bounds(centerX - 100, startY + 25, 200, 20)
+            Button mobButton = Button.builder(
+                            getMobButtonText(),
+                            this::toggleMobTrampling)
+                    .bounds(centerX - 100, startY + 50, 200, 20)
                     .build();
             this.addRenderableWidget(mobButton);
 
             this.addRenderableWidget(Button.builder(
-                    Component.translatable("gui.done"),
-                    button -> this.onClose())
-                    .bounds(centerX - 100, startY + 70, 200, 20)
-                    .build());
+                Component.translatable("gui.done"),
+                button -> this.onClose())
+                .bounds(centerX - 100, startY + 95, 200, 20)
+                .build());
+        }
+
+        /**
+         * Toggles the player trampling prevention setting.
+         *
+         * @param button the button that was clicked
+         */
+        private void toggleEmptyTrampling(Button button) {
+            ModConfig.setPreventPlayerTrampling(!ModConfig.isPreventPlayerTrampling());
+            button.setMessage(getEmptyButtonText());
         }
 
         /**
@@ -91,6 +106,13 @@ public class ModMenuIntegration implements ModMenuApi {
                     .append(ModConfig.isPreventPlayerTrampling()
                             ? Component.literal("§aPrevented")
                             : Component.literal("§cAllowed"));
+        }
+
+        private @NonNull Component getEmptyButtonText() {
+            return Component.literal("Empty Trampling: ")
+                    .append(ModConfig.isPreventEmptyTrampling()
+                        ? Component.literal("§aPrevented")
+                        : Component.literal("§cAllowed"));
         }
 
         /**

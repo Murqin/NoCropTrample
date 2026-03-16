@@ -4,6 +4,8 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.murqin.nocroptrample.NoCropTrampleMod;
+import com.murqin.nocroptrample.StateName;
 import com.murqin.nocroptrample.config.ModConfig;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.CommandSourceStack;
@@ -31,8 +33,10 @@ public class NoCropTrampleCommand {
         private static final String PREFIX = "§6[NoCropTrample] ";
         private static final String PREFIX_ERROR = "§c[NoCropTrample] ";
         private static final String LABEL_STATUS = "§fStatus:";
+        private static final String LABEL_EMPTY = "§7Empty farmland trampling prevention: ";
         private static final String LABEL_PLAYER = "§7Player trampling prevention: ";
         private static final String LABEL_MOB = "§7Mob trampling prevention: ";
+        private static final String LABEL_ERROR = "§7Couldn't set unknown prevention type to: ";
         private static final String MSG_INVALID_STATE = "Invalid state! Use 'on' or 'off'.";
         private static final String MSG_CONFIG_RELOADED = "§aConfig reloaded!";
 
@@ -46,6 +50,9 @@ public class NoCropTrampleCommand {
                                 Commands.literal("nocroptrample")
                                                 // /nocroptrample - show status
                                                 .executes(NoCropTrampleCommand::showStatus)
+
+                                                // /nocroptrample empty [on|off]
+                                                .then(buildEmptyCommand())
 
                                                 // /nocroptrample player [on|off]
                                                 .then(buildPlayerCommand())
@@ -62,6 +69,22 @@ public class NoCropTrampleCommand {
                                                                 .requires(source -> checkPermission(source,
                                                                                 REQUIRED_OP_LEVEL))
                                                                 .executes(NoCropTrampleCommand::reloadConfig)));
+        }
+
+        private static LiteralArgumentBuilder<CommandSourceStack> buildEmptyCommand() {
+            return Commands.literal("empty")
+                            .executes(NoCropTrampleCommand::showEmptyStatus)
+                            .then(Commands.argument("state", StringArgumentType.word())
+                                    .requires(source -> checkPermission(source, REQUIRED_OP_LEVEL))
+                                    .suggests((context, builder) -> {
+                                        builder.suggest(STATE_ON);
+                                        builder.suggest(STATE_OFF);
+                                        return builder.buildFuture();
+                                    })
+                                    .executes(context -> setState(
+                                            context,
+                                            StringArgumentType.getString(context,"state"),
+                                            StateName.EMPTY)));
         }
 
         /**
@@ -82,7 +105,7 @@ public class NoCropTrampleCommand {
                                                 .executes(context -> setState(
                                                                 context,
                                                                 StringArgumentType.getString(context, "state"),
-                                                                true)));
+                                                                StateName.PLAYER)));
         }
 
         /**
@@ -103,7 +126,7 @@ public class NoCropTrampleCommand {
                                                 .executes(context -> setState(
                                                                 context,
                                                                 StringArgumentType.getString(context, "state"),
-                                                                false)));
+                                                                StateName.MOB)));
         }
 
         /**
@@ -127,15 +150,32 @@ public class NoCropTrampleCommand {
          * @return command result code (1 for success)
          */
         private static int showStatus(CommandContext<CommandSourceStack> context) {
-                CommandSourceStack source = context.getSource();
+            CommandSourceStack source = context.getSource();
 
-                source.sendSuccess(() -> Component.literal(PREFIX + LABEL_STATUS), false);
-                source.sendSuccess(() -> Component.literal("  " + LABEL_PLAYER)
-                                .append(getStatusText(ModConfig.isPreventPlayerTrampling())), false);
-                source.sendSuccess(() -> Component.literal("  " + LABEL_MOB)
-                                .append(getStatusText(ModConfig.isPreventMobTrampling())), false);
+            source.sendSuccess(() -> Component.literal(PREFIX + LABEL_STATUS), false);
+            source.sendSuccess(() -> Component.literal("  " + LABEL_EMPTY)
+                .append(getStatusText(ModConfig.isPreventPlayerTrampling())), false);
+            source.sendSuccess(() -> Component.literal("  " + LABEL_PLAYER)
+                .append(getStatusText(ModConfig.isPreventPlayerTrampling())), false);
+            source.sendSuccess(() -> Component.literal("  " + LABEL_MOB)
+                .append(getStatusText(ModConfig.isPreventMobTrampling())), false);
 
                 return 1;
+        }
+
+        /**
+         * Shows only the empty trampling prevention status.
+         *
+         * @param context the command context
+         * @return command result code (1 for success)
+         */
+        private static int showEmptyStatus(CommandContext<CommandSourceStack> context) {
+            CommandSourceStack source = context.getSource();
+            source.sendSuccess(
+                    () -> Component.literal(PREFIX + LABEL_PLAYER)
+                            .append(getStatusText(ModConfig.isPreventPlayerTrampling())),
+                    false);
+            return 1;
         }
 
         /**
@@ -173,10 +213,10 @@ public class NoCropTrampleCommand {
          *
          * @param context  the command context
          * @param state    the state to set ("on" or "off")
-         * @param isPlayer true for player setting, false for mob setting
+         * @param stateName name of state to be set
          * @return command result code (1 for success, 0 for failure)
          */
-        private static int setState(CommandContext<CommandSourceStack> context, String state, boolean isPlayer) {
+        private static int setState(CommandContext<CommandSourceStack> context, String state, StateName stateName) {
                 CommandSourceStack source = context.getSource();
 
                 if (!state.equalsIgnoreCase(STATE_ON) && !state.equalsIgnoreCase(STATE_OFF)) {
@@ -187,12 +227,23 @@ public class NoCropTrampleCommand {
                 boolean newState = state.equalsIgnoreCase(STATE_ON);
                 String label;
 
-                if (isPlayer) {
+                switch (stateName) {
+                    case StateName.EMPTY -> {
+                        ModConfig.setPreventEmptyTrampling(newState);
+                        label = LABEL_EMPTY;
+                    }
+                    case StateName.PLAYER -> {
                         ModConfig.setPreventPlayerTrampling(newState);
                         label = LABEL_PLAYER;
-                } else {
+                    }
+                    case StateName.MOB -> {
                         ModConfig.setPreventMobTrampling(newState);
                         label = LABEL_MOB;
+                    }
+                    default -> {
+                        NoCropTrampleMod.LOGGER.error("Tried setting state of {}, which is not a valid state!", stateName);
+                        label = LABEL_ERROR;
+                    }
                 }
 
                 source.sendSuccess(

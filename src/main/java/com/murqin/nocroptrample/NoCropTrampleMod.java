@@ -30,6 +30,7 @@ public class NoCropTrampleMod implements ModInitializer {
             NoCropTrampleCommand.register(dispatcher);
         });
 
+        LOGGER.info("Empty trampling prevention: {}", ModConfig.isPreventEmptyTrampling() ? "ON" : "OFF");
         LOGGER.info("Player trampling prevention: {}", ModConfig.isPreventPlayerTrampling() ? "ON" : "OFF");
         LOGGER.info("Mob trampling prevention: {}", ModConfig.isPreventMobTrampling() ? "ON" : "OFF");
     }

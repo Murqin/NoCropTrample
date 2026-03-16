@@ -1,8 +1,10 @@
 package com.murqin.nocroptrample.mixin;
 
 import com.murqin.nocroptrample.config.ModConfig;
+import net.minecraft.world.level.block.StemBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.FarmlandBlock;
+import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.core.BlockPos;
@@ -47,6 +49,14 @@ public abstract class FarmlandBlockMixin {
         }
 
         boolean isPlayer = entity instanceof Player;
+        boolean isEmpty = !(
+            (level.getBlockState(pos.above()).getBlock() instanceof CropBlock)
+            || (level.getBlockState(pos.above()).getBlock() instanceof StemBlock)
+        );
+
+        if (isEmpty && !ModConfig.isPreventEmptyTrampling()) {
+            return;
+        }
 
         if (isPlayer && ModConfig.isPreventPlayerTrampling()) {
             ci.cancel();

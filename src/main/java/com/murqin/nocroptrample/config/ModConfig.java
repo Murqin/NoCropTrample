@@ -25,6 +25,28 @@ public class ModConfig {
     // Config values - encapsulated with getters/setters
     private static boolean preventPlayerTrampling = true;
     private static boolean preventMobTrampling = true;
+    private static boolean preventEmptyTrampling = true;
+
+    /**
+     * Gets whether empty trampling prevention is enabled.
+     *
+     * @return true if players cannot trample farmland, false otherwise
+     */
+    public static boolean isPreventEmptyTrampling() {
+        return preventEmptyTrampling;
+    }
+
+    /**
+     * Sets whether empty trampling prevention is enabled.
+     * Automatically saves the configuration after updating.
+     *
+     * @param value true to prevent players from trampling farmland, false otherwise
+     */
+    public static void setPreventEmptyTrampling(boolean value) {
+        preventEmptyTrampling = value;
+        save();
+    }
+
 
     /**
      * Gets whether player trampling prevention is enabled.
@@ -73,11 +95,12 @@ public class ModConfig {
     public static void load() {
         if (Files.exists(CONFIG_PATH)) {
             try {
-                String json = new String(Files.readAllBytes(CONFIG_PATH), java.nio.charset.StandardCharsets.UTF_8);
+                String json = Files.readString(CONFIG_PATH);
                 ConfigData data = GSON.fromJson(json, ConfigData.class);
                 if (data != null) {
                     preventPlayerTrampling = data.preventPlayerTrampling;
                     preventMobTrampling = data.preventMobTrampling;
+                    preventEmptyTrampling = data.preventEmptyTrampling;
                 }
                 NoCropTrampleMod.LOGGER.info("Config loaded from {}", CONFIG_PATH);
             } catch (IOException e) {
@@ -98,7 +121,7 @@ public class ModConfig {
             data.preventMobTrampling = preventMobTrampling;
 
             Files.createDirectories(CONFIG_PATH.getParent());
-            Files.write(CONFIG_PATH, GSON.toJson(data).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            Files.writeString(CONFIG_PATH, GSON.toJson(data));
             NoCropTrampleMod.LOGGER.info("Config saved to {}", CONFIG_PATH);
         } catch (IOException e) {
             NoCropTrampleMod.LOGGER.error("Failed to save config", e);
@@ -109,6 +132,7 @@ public class ModConfig {
      * Inner class for JSON serialization/deserialization.
      */
     private static class ConfigData {
+        boolean preventEmptyTrampling = true;
         boolean preventPlayerTrampling = true;
         boolean preventMobTrampling = true;
     }
