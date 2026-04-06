@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.1] - 2026-04-06
+
+### Technical
+- **Minecraft 26.1 Compatibility Fix** — Updated the Mod Menu config screen API to support the new `GuiGraphicsExtractor` and `extractRenderState` systems. This fixes compilation errors where `GuiGraphics` and `render` were no longer available.
+
 ## [1.2.0] - 2026-03-17
 
 ### New Features
