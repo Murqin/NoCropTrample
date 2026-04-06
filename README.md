@@ -1,11 +1,11 @@
 # No Crop Trample (Fabric)
 
-![Fabric 1.21+](https://img.shields.io/badge/Fabric-1.21%2B-blue?style=flat-square)
+![Fabric 26.1+](https://img.shields.io/badge/Fabric-26.1%2B-blue?style=flat-square)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 
 [![Demo Video](https://img.shields.io/badge/Demo-YouTube-red?style=flat-square)](https://youtu.be/ypxASh8R1tI)
 
-**No Crop Trample** is a lightweight, server-side utility mod for Minecraft **Fabric 1.21+** that prevents crops (farmland) from being trampled by players or mobs.
+**No Crop Trample** is a lightweight, server-side utility mod for Minecraft **Fabric 26.1+** that prevents crops (farmland) from being trampled by players or mobs.
 
 ## ✨ Features
 
@@ -48,7 +48,7 @@ Located at `config/nocroptrample.json`.
 
 ## 🛠️ Build from Source
 
-Requirements: Java 21 (JDK 21)
+Requirements: Java 25 (JDK 25)
 
 ```bash
 git clone https://github.com/Murqin/NoCropTrample.git
