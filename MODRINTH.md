@@ -1,17 +1,17 @@
-# No Crop Trample
+# No Crop Trample 🌾
 
-🌾 **Stop players and mobs from destroying your precious crops!**
+**Stop players and mobs from destroying your precious crops!**
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/ypxASh8R1tI" frameborder="0" allowfullscreen></iframe>
 
-No Crop Trample is a lightweight utility mod that prevents farmland from being trampled and converted to dirt when entities jump on it.
+No Crop Trample is a lightweight utility mod that prevents farmland from being trampled and converted to dirt when players or mobs jump on it.
 
 ---
 
 ## ✨ Features
 
 ### 🛡️ Anti-Trample Protection
-Prevents farmland blocks from being destroyed when players or mobs land on them. Your crops stay safe!
+Prevents farmland blocks from being destroyed when entities land on them. Your crops stay safe!
 
 ### ⚙️ Granular Control
 Configure player and mob trampling independently:
@@ -33,10 +33,10 @@ All commands require Operator (OP) permission level.
 
 | Command | Description |
 |---------|-------------|
-| `/nocroptrample` | Show current status |
-| `/nocroptrample player <on\|off>` | Toggle player trampling prevention |
-| `/nocroptrample mob <on\|off>` | Toggle mob trampling prevention |
-| `/nocroptrample reload` | Reload configuration |
+| `/nocroptrample` | Show current status. |
+| `/nocroptrample player <on\|off>` | Toggle player trampling prevention. |
+| `/nocroptrample mob <on\|off>` | Toggle mob trampling prevention. |
+| `/nocroptrample reload` | Reload configuration. |
 
 ---
 
