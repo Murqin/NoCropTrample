@@ -136,7 +136,7 @@ public class ModMenuIntegration implements ModMenuApi {
         @Override
         public void onClose() {
             if (this.minecraft != null) {
-                this.minecraft.setScreen(this.parent);
+                this.minecraft.setScreenAndShow(this.parent);
             }
         }
     }

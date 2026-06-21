@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3-26.2] - 2026-06-21
+
+### Technical
+- **Ported to Minecraft 26.2** — Bumped `minecraft_version` to `26.2`, `loader_version` to `0.19.3`, `loom_version` to `1.17-SNAPSHOT`, `fabric_api_version` to `0.152.2+26.2`.
+- **Gradle wrapper upgraded to 9.5.0** — Required by Fabric Loom 1.17 which mandates `org.gradle.plugin.api-version` 9.5.0.
+- **`Minecraft#setScreen` renamed to `Minecraft#setScreenAndShow`** — Updated `ModMenuIntegration#onClose` accordingly.
+- **Mod Menu bumped to 20.0.0-beta.1** — `18.0.0-alpha.8` called `I18n#exists(String)` which was removed in 26.2, causing a `NoSuchMethodError` crash on the title screen.
+
 ## [1.2.1] - 2026-04-06
 
 ### Technical
