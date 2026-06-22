@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4-26.2] - 2026-06-22
+
+### Bug Fixes
+- **Fixed `preventEmptyTrampling` not persisting across restarts** — `save()` was missing the assignment of `preventEmptyTrampling` to `ConfigData`; the field defaulted to `true` on every save, silently discarding the user's setting.
+
 ## [1.3-26.2] - 2026-06-21
 
 ### Technical
