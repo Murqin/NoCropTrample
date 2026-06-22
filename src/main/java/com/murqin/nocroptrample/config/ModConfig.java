@@ -119,6 +119,7 @@ public class ModConfig {
             ConfigData data = new ConfigData();
             data.preventPlayerTrampling = preventPlayerTrampling;
             data.preventMobTrampling = preventMobTrampling;
+            data.preventEmptyTrampling = preventEmptyTrampling;
 
             Files.createDirectories(CONFIG_PATH.getParent());
             Files.writeString(CONFIG_PATH, GSON.toJson(data));
