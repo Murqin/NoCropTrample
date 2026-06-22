@@ -12,7 +12,6 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
 import org.jspecify.annotations.NonNull;
-import net.minecraft.server.players.NameAndId;
 
 /**
  * Handles the /nocroptrample command registration and execution.
@@ -137,10 +136,12 @@ public class NoCropTrampleCommand {
          * @return true if the source has permission, false otherwise
          */
         private static boolean checkPermission(CommandSourceStack source, int level) {
-                if (source.getEntity() instanceof net.minecraft.server.level.ServerPlayer player) {
-                        return source.getServer().getPlayerList().isOp(new NameAndId(player.getGameProfile()));
+                net.minecraft.server.permissions.PermissionSet permissions = source.permissions();
+                if (permissions instanceof net.minecraft.server.permissions.LevelBasedPermissionSet levelBased) {
+                        return levelBased.level().isEqualOrHigherThan(
+                                net.minecraft.server.permissions.PermissionLevel.byId(level));
                 }
-                return true;
+                return permissions == net.minecraft.server.permissions.PermissionSet.ALL_PERMISSIONS;
         }
 
         /**
@@ -154,7 +155,7 @@ public class NoCropTrampleCommand {
 
             source.sendSuccess(() -> Component.literal(PREFIX + LABEL_STATUS), false);
             source.sendSuccess(() -> Component.literal("  " + LABEL_EMPTY)
-                .append(getStatusText(ModConfig.isPreventPlayerTrampling())), false);
+                .append(getStatusText(ModConfig.isPreventEmptyTrampling())), false);
             source.sendSuccess(() -> Component.literal("  " + LABEL_PLAYER)
                 .append(getStatusText(ModConfig.isPreventPlayerTrampling())), false);
             source.sendSuccess(() -> Component.literal("  " + LABEL_MOB)
@@ -172,8 +173,8 @@ public class NoCropTrampleCommand {
         private static int showEmptyStatus(CommandContext<CommandSourceStack> context) {
             CommandSourceStack source = context.getSource();
             source.sendSuccess(
-                    () -> Component.literal(PREFIX + LABEL_PLAYER)
-                            .append(getStatusText(ModConfig.isPreventPlayerTrampling())),
+                    () -> Component.literal(PREFIX + LABEL_EMPTY)
+                            .append(getStatusText(ModConfig.isPreventEmptyTrampling())),
                     false);
             return 1;
         }

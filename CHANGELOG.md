@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5-26.2] - 2026-06-22
+
+### Bug Fixes
+- **Fixed `/nocroptrample status` displaying wrong value for "Empty" row** — The status output was showing the player-trampling flag for the empty-farmland row; it now correctly shows `preventEmptyTrampling`.
+- **Fixed `/nocroptrample empty` (no argument) displaying wrong label and value** — The command was rendering "Player trampling prevention" with the player flag instead of "Empty farmland trampling prevention" with the empty flag.
+- **Fixed `preventEmptyTrampling` having no effect when player and mob prevention are both disabled** — The flag now independently cancels trampling on empty farmland regardless of the player/mob settings.
+- **Fixed `AttachedStemBlock` (grown pumpkin/melon stem) not recognized as a crop** — Farmland beneath a fruit-bearing stem was incorrectly treated as empty; `AttachedStemBlock` is now included in the crop check.
+- **Fixed OP level check ignoring `REQUIRED_OP_LEVEL`** — Permission gating now uses `LevelBasedPermissionSet` to properly enforce level 2 (Gamemaster); previously any OP regardless of level could use admin commands.
+- **Fixed potential config default mismatch on upgrade** — GSON now uses an `InstanceCreator` for `ConfigData`, ensuring field initializers (all default to `true`) run even when loading a config file that predates a field.
+
 ## [1.4-26.2] - 2026-06-22
 
 ### Bug Fixes

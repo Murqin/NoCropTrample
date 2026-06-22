@@ -2,6 +2,7 @@ package com.murqin.nocroptrample.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.InstanceCreator;
 import com.murqin.nocroptrample.NoCropTrampleMod;
 import net.fabricmc.loader.api.FabricLoader;
 
@@ -17,7 +18,10 @@ import java.nio.file.Path;
  * </p>
  */
 public class ModConfig {
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson GSON = new GsonBuilder()
+            .setPrettyPrinting()
+            .registerTypeAdapter(ConfigData.class, (InstanceCreator<ConfigData>) type -> new ConfigData())
+            .create();
     private static final Path CONFIG_PATH = FabricLoader.getInstance()
             .getConfigDir()
             .resolve(NoCropTrampleMod.MOD_ID + ".json");
@@ -30,7 +34,7 @@ public class ModConfig {
     /**
      * Gets whether empty trampling prevention is enabled.
      *
-     * @return true if players cannot trample farmland, false otherwise
+     * @return true if empty farmland cannot be trampled, false otherwise
      */
     public static boolean isPreventEmptyTrampling() {
         return preventEmptyTrampling;
@@ -40,7 +44,7 @@ public class ModConfig {
      * Sets whether empty trampling prevention is enabled.
      * Automatically saves the configuration after updating.
      *
-     * @param value true to prevent players from trampling farmland, false otherwise
+     * @param value true to prevent trampling of empty farmland, false otherwise
      */
     public static void setPreventEmptyTrampling(boolean value) {
         preventEmptyTrampling = value;
