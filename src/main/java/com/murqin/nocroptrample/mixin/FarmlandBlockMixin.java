@@ -1,16 +1,25 @@
 package com.murqin.nocroptrample.mixin;
 
 import com.murqin.nocroptrample.config.ModConfig;
+import com.murqin.nocroptrample.util.FeedbackHelper;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.OwnableEntity;
+import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.npc.villager.Villager;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.AttachedStemBlock;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.CropBlock;
+import net.minecraft.world.level.block.FarmlandBlock;
 import net.minecraft.world.level.block.StemBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.FarmlandBlock;
-import net.minecraft.world.level.block.CropBlock;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -22,7 +31,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * This mixin intercepts the {@code turnToDirt} method which converts farmland
  * to dirt when an entity jumps or falls on it. By injecting at the HEAD with
  * cancellable=true, we can prevent the trampling behavior selectively based
- * on whether the entity is a player or mob and what the configuration allows.
+ * on whether the entity is a player, pet, villager, or mob and what the configuration allows.
  * </p>
  */
 @Mixin(FarmlandBlock.class)
@@ -34,7 +43,7 @@ public abstract class FarmlandBlockMixin {
      * This injection runs before farmland converts to dirt. If the entity is
      * null (natural conversion like dehydration), the method proceeds normally.
      * Otherwise, it checks configuration to determine if trampling should be
-     * prevented based on entity type (player vs mob).
+     * prevented based on entity type and enchantment/equipment checks.
      * </p>
      *
      * @param entity the entity causing trampling (null for natural conversion)
@@ -50,7 +59,6 @@ public abstract class FarmlandBlockMixin {
             return;
         }
 
-        boolean isPlayer = entity instanceof Player;
         Block aboveBlock = level.getBlockState(pos.above()).getBlock();
         boolean isEmpty = !(
             aboveBlock instanceof CropBlock
@@ -61,17 +69,84 @@ public abstract class FarmlandBlockMixin {
         if (isEmpty) {
             if (ModConfig.isPreventEmptyTrampling()) {
                 ci.cancel();
+                FeedbackHelper.triggerProtectionFeedback(level, pos, entity);
             }
             return;
         }
 
-        if (isPlayer && ModConfig.isPreventPlayerTrampling()) {
-            ci.cancel();
+        // Check if entity is a Pet (TamableAnimal or OwnableEntity)
+        if (entity instanceof TamableAnimal || entity instanceof OwnableEntity) {
+            if (ModConfig.isPreventPetTrampling()) {
+                ci.cancel();
+                FeedbackHelper.triggerProtectionFeedback(level, pos, entity);
+            }
             return;
         }
 
-        if (!isPlayer && ModConfig.isPreventMobTrampling()) {
-            ci.cancel();
+        // Check if entity is a Villager
+        if (entity instanceof Villager) {
+            if (ModConfig.isPreventVillagerTrampling()) {
+                ci.cancel();
+                FeedbackHelper.triggerProtectionFeedback(level, pos, entity);
+            }
+            return;
         }
+
+        // Check if entity is a Player
+        if (entity instanceof Player player) {
+            if (!ModConfig.isPreventPlayerTrampling()) {
+                return;
+            }
+
+            // Leather Boots check
+            if (ModConfig.isProtectWithLeatherBoots() && player.getItemBySlot(EquipmentSlot.FEET).is(Items.LEATHER_BOOTS)) {
+                ci.cancel();
+                FeedbackHelper.triggerProtectionFeedback(level, pos, entity);
+                return;
+            }
+
+            // Feather Falling check
+            ModConfig.FeatherFallingMode ffMode = ModConfig.getFeatherFallingMode();
+            switch (ffMode) {
+                case DISABLED:
+                    ci.cancel();
+                    FeedbackHelper.triggerProtectionFeedback(level, pos, entity);
+                    break;
+                case ANY_LEVEL: {
+                    int ffLevel = getFeatherFallingLevel(level, player);
+                    if (ffLevel > 0) {
+                        ci.cancel();
+                        FeedbackHelper.triggerProtectionFeedback(level, pos, entity);
+                    }
+                    break;
+                }
+                case SCALED: {
+                    int ffLevel = getFeatherFallingLevel(level, player);
+                    if (ffLevel > 0) {
+                        float chance = ffLevel * 0.25f;
+                        if (level.getRandom().nextFloat() < chance) {
+                            ci.cancel();
+                            FeedbackHelper.triggerProtectionFeedback(level, pos, entity);
+                        }
+                    }
+                    break;
+                }
+            }
+            return;
+        }
+
+        // Generic Mob check
+        if (ModConfig.isPreventMobTrampling()) {
+            ci.cancel();
+            FeedbackHelper.triggerProtectionFeedback(level, pos, entity);
+        }
+    }
+
+    private static int getFeatherFallingLevel(Level level, Player player) {
+        return level.registryAccess()
+                .lookup(Registries.ENCHANTMENT)
+                .flatMap(registry -> registry.get(Enchantments.FEATHER_FALLING))
+                .map(holder -> EnchantmentHelper.getEnchantmentLevel(holder, player))
+                .orElse(0);
     }
 }
