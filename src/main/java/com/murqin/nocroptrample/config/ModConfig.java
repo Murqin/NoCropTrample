@@ -24,6 +24,13 @@ public class ModConfig {
         SCALED
     }
 
+    public enum ModPreset {
+        VANILLA_PLUS,
+        CASUAL,
+        HARDCORE,
+        CUSTOM
+    }
+
     private static final Gson GSON = new GsonBuilder()
             .setPrettyPrinting()
             .registerTypeAdapter(ConfigData.class, (InstanceCreator<ConfigData>) type -> new ConfigData())
@@ -33,9 +40,10 @@ public class ModConfig {
             .resolve(NoCropTrampleMod.MOD_ID + ".json");
 
     // Config values - encapsulated with getters/setters
+    private static ModPreset activePreset = ModPreset.VANILLA_PLUS;
     private static boolean preventPlayerTrampling = true;
-    private static boolean preventMobTrampling = true;
-    private static boolean preventEmptyTrampling = true;
+    private static boolean preventMobTrampling = false;
+    private static boolean preventEmptyTrampling = false;
     private static FeatherFallingMode featherFallingMode = FeatherFallingMode.ANY_LEVEL;
     private static boolean protectWithLeatherBoots = true;
     private static boolean preventPetTrampling = true;
@@ -46,6 +54,120 @@ public class ModConfig {
     private static boolean enableSound = true;
     private static boolean enableActionBarMessage = false;
     private static int actionBarCooldownSeconds = 3;
+
+    public static ModPreset getActivePreset() {
+        return activePreset;
+    }
+
+    public static void setPreset(ModPreset preset) {
+        activePreset = preset != null ? preset : ModPreset.VANILLA_PLUS;
+        applyPreset(activePreset);
+        save();
+    }
+
+    public static void applyPreset(ModPreset preset) {
+        if (preset == null) {
+            return;
+        }
+        switch (preset) {
+            case VANILLA_PLUS -> {
+                preventPlayerTrampling = true;
+                preventMobTrampling = false;
+                preventEmptyTrampling = false;
+                featherFallingMode = FeatherFallingMode.ANY_LEVEL;
+                protectWithLeatherBoots = true;
+                preventPetTrampling = true;
+                preventVillagerTrampling = true;
+                preventDehydration = false;
+                preventEmptyReversion = false;
+                enableParticles = true;
+                enableSound = true;
+                enableActionBarMessage = false;
+            }
+            case CASUAL -> {
+                preventPlayerTrampling = true;
+                preventMobTrampling = true;
+                preventEmptyTrampling = true;
+                featherFallingMode = FeatherFallingMode.DISABLED;
+                protectWithLeatherBoots = true;
+                preventPetTrampling = true;
+                preventVillagerTrampling = true;
+                preventDehydration = true;
+                preventEmptyReversion = true;
+                enableParticles = true;
+                enableSound = true;
+                enableActionBarMessage = false;
+            }
+            case HARDCORE -> {
+                preventPlayerTrampling = true;
+                preventMobTrampling = false;
+                preventEmptyTrampling = false;
+                featherFallingMode = FeatherFallingMode.SCALED;
+                protectWithLeatherBoots = false;
+                preventPetTrampling = false;
+                preventVillagerTrampling = false;
+                preventDehydration = false;
+                preventEmptyReversion = false;
+                enableParticles = true;
+                enableSound = true;
+                enableActionBarMessage = false;
+            }
+            case CUSTOM -> {
+                // keep current settings
+            }
+        }
+    }
+
+    public static boolean matchesPreset(ModPreset preset) {
+        if (preset == null || preset == ModPreset.CUSTOM) {
+            return true;
+        }
+        return switch (preset) {
+            case VANILLA_PLUS -> preventPlayerTrampling == true &&
+                    preventMobTrampling == false &&
+                    preventEmptyTrampling == false &&
+                    featherFallingMode == FeatherFallingMode.ANY_LEVEL &&
+                    protectWithLeatherBoots == true &&
+                    preventPetTrampling == true &&
+                    preventVillagerTrampling == true &&
+                    preventDehydration == false &&
+                    preventEmptyReversion == false &&
+                    enableParticles == true &&
+                    enableSound == true &&
+                    enableActionBarMessage == false;
+            case CASUAL -> preventPlayerTrampling == true &&
+                    preventMobTrampling == true &&
+                    preventEmptyTrampling == true &&
+                    featherFallingMode == FeatherFallingMode.DISABLED &&
+                    protectWithLeatherBoots == true &&
+                    preventPetTrampling == true &&
+                    preventVillagerTrampling == true &&
+                    preventDehydration == true &&
+                    preventEmptyReversion == true &&
+                    enableParticles == true &&
+                    enableSound == true &&
+                    enableActionBarMessage == false;
+            case HARDCORE -> preventPlayerTrampling == true &&
+                    preventMobTrampling == false &&
+                    preventEmptyTrampling == false &&
+                    featherFallingMode == FeatherFallingMode.SCALED &&
+                    protectWithLeatherBoots == false &&
+                    preventPetTrampling == false &&
+                    preventVillagerTrampling == false &&
+                    preventDehydration == false &&
+                    preventEmptyReversion == false &&
+                    enableParticles == true &&
+                    enableSound == true &&
+                    enableActionBarMessage == false;
+            case CUSTOM -> true;
+        };
+    }
+
+    private static void checkPresetMatch() {
+        if (activePreset != ModPreset.CUSTOM && !matchesPreset(activePreset)) {
+            activePreset = ModPreset.CUSTOM;
+        }
+    }
 
     /**
      * Gets whether empty trampling prevention is enabled.
@@ -64,6 +186,7 @@ public class ModConfig {
      */
     public static void setPreventEmptyTrampling(boolean value) {
         preventEmptyTrampling = value;
+        checkPresetMatch();
         save();
     }
 
@@ -84,6 +207,7 @@ public class ModConfig {
      */
     public static void setPreventPlayerTrampling(boolean value) {
         preventPlayerTrampling = value;
+        checkPresetMatch();
         save();
     }
 
@@ -104,6 +228,7 @@ public class ModConfig {
      */
     public static void setPreventMobTrampling(boolean value) {
         preventMobTrampling = value;
+        checkPresetMatch();
         save();
     }
 
@@ -113,6 +238,7 @@ public class ModConfig {
 
     public static void setFeatherFallingMode(FeatherFallingMode value) {
         featherFallingMode = value != null ? value : FeatherFallingMode.ANY_LEVEL;
+        checkPresetMatch();
         save();
     }
 
@@ -122,6 +248,7 @@ public class ModConfig {
 
     public static void setProtectWithLeatherBoots(boolean value) {
         protectWithLeatherBoots = value;
+        checkPresetMatch();
         save();
     }
 
@@ -131,6 +258,7 @@ public class ModConfig {
 
     public static void setPreventPetTrampling(boolean value) {
         preventPetTrampling = value;
+        checkPresetMatch();
         save();
     }
 
@@ -140,6 +268,7 @@ public class ModConfig {
 
     public static void setPreventVillagerTrampling(boolean value) {
         preventVillagerTrampling = value;
+        checkPresetMatch();
         save();
     }
 
@@ -149,6 +278,7 @@ public class ModConfig {
 
     public static void setPreventDehydration(boolean value) {
         preventDehydration = value;
+        checkPresetMatch();
         save();
     }
 
@@ -158,6 +288,7 @@ public class ModConfig {
 
     public static void setPreventEmptyReversion(boolean value) {
         preventEmptyReversion = value;
+        checkPresetMatch();
         save();
     }
 
@@ -167,6 +298,7 @@ public class ModConfig {
 
     public static void setEnableParticles(boolean value) {
         enableParticles = value;
+        checkPresetMatch();
         save();
     }
 
@@ -176,6 +308,7 @@ public class ModConfig {
 
     public static void setEnableSound(boolean value) {
         enableSound = value;
+        checkPresetMatch();
         save();
     }
 
@@ -185,6 +318,7 @@ public class ModConfig {
 
     public static void setEnableActionBarMessage(boolean value) {
         enableActionBarMessage = value;
+        checkPresetMatch();
         save();
     }
 
@@ -194,6 +328,7 @@ public class ModConfig {
 
     public static void setActionBarCooldownSeconds(int value) {
         actionBarCooldownSeconds = value;
+        checkPresetMatch();
         save();
     }
 
@@ -207,18 +342,23 @@ public class ModConfig {
                 String json = Files.readString(CONFIG_PATH);
                 ConfigData data = GSON.fromJson(json, ConfigData.class);
                 if (data != null) {
-                    preventPlayerTrampling = data.preventPlayerTrampling;
-                    preventMobTrampling = data.preventMobTrampling;
-                    preventEmptyTrampling = data.preventEmptyTrampling;
-                    featherFallingMode = data.featherFallingMode != null ? data.featherFallingMode : FeatherFallingMode.ANY_LEVEL;
-                    protectWithLeatherBoots = data.protectWithLeatherBoots;
-                    preventPetTrampling = data.preventPetTrampling;
-                    preventVillagerTrampling = data.preventVillagerTrampling;
-                    preventDehydration = data.preventDehydration;
-                    preventEmptyReversion = data.preventEmptyReversion;
-                    enableParticles = data.enableParticles;
-                    enableSound = data.enableSound;
-                    enableActionBarMessage = data.enableActionBarMessage;
+                    activePreset = data.activePreset != null ? data.activePreset : ModPreset.VANILLA_PLUS;
+                    if (activePreset != ModPreset.CUSTOM) {
+                        applyPreset(activePreset);
+                    } else {
+                        preventPlayerTrampling = data.preventPlayerTrampling;
+                        preventMobTrampling = data.preventMobTrampling;
+                        preventEmptyTrampling = data.preventEmptyTrampling;
+                        featherFallingMode = data.featherFallingMode != null ? data.featherFallingMode : FeatherFallingMode.ANY_LEVEL;
+                        protectWithLeatherBoots = data.protectWithLeatherBoots;
+                        preventPetTrampling = data.preventPetTrampling;
+                        preventVillagerTrampling = data.preventVillagerTrampling;
+                        preventDehydration = data.preventDehydration;
+                        preventEmptyReversion = data.preventEmptyReversion;
+                        enableParticles = data.enableParticles;
+                        enableSound = data.enableSound;
+                        enableActionBarMessage = data.enableActionBarMessage;
+                    }
                     actionBarCooldownSeconds = data.actionBarCooldownSeconds;
                 }
                 NoCropTrampleMod.LOGGER.info("Config loaded from {}", CONFIG_PATH);
@@ -236,6 +376,7 @@ public class ModConfig {
     public static void save() {
         try {
             ConfigData data = new ConfigData();
+            data.activePreset = activePreset;
             data.preventPlayerTrampling = preventPlayerTrampling;
             data.preventMobTrampling = preventMobTrampling;
             data.preventEmptyTrampling = preventEmptyTrampling;
@@ -262,9 +403,10 @@ public class ModConfig {
      * Inner class for JSON serialization/deserialization.
      */
     private static class ConfigData {
-        boolean preventEmptyTrampling = true;
+        ModPreset activePreset = ModPreset.VANILLA_PLUS;
+        boolean preventEmptyTrampling = false;
         boolean preventPlayerTrampling = true;
-        boolean preventMobTrampling = true;
+        boolean preventMobTrampling = false;
         FeatherFallingMode featherFallingMode = FeatherFallingMode.ANY_LEVEL;
         boolean protectWithLeatherBoots = true;
         boolean preventPetTrampling = true;
@@ -277,3 +419,4 @@ public class ModConfig {
         int actionBarCooldownSeconds = 3;
     }
 }
+

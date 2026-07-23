@@ -32,6 +32,7 @@ public class NoCropTrampleCommand {
         private static final String PREFIX = "§6[NoCropTrample] ";
         private static final String PREFIX_ERROR = "§c[NoCropTrample] ";
         private static final String LABEL_STATUS = "§fStatus:";
+        private static final String LABEL_PRESET = "§7Active Preset: ";
         private static final String LABEL_EMPTY = "§7Empty farmland trampling prevention: ";
         private static final String LABEL_PLAYER = "§7Player trampling prevention: ";
         private static final String LABEL_MOB = "§7Mob trampling prevention: ";
@@ -68,6 +69,9 @@ public class NoCropTrampleCommand {
                                                 // /nocroptrample mob [on|off]
                                                 .then(buildMobCommand())
 
+                                                // /nocroptrample preset [vanilla_plus|casual|hardcore|custom]
+                                                .then(buildPresetCommand())
+
                                                 // /nocroptrample status
                                                 .then(Commands.literal("status")
                                                                 .executes(NoCropTrampleCommand::showStatus))
@@ -77,6 +81,21 @@ public class NoCropTrampleCommand {
                                                                 .requires(source -> checkPermission(source,
                                                                                 REQUIRED_OP_LEVEL))
                                                                 .executes(NoCropTrampleCommand::reloadConfig)));
+        }
+
+        private static LiteralArgumentBuilder<CommandSourceStack> buildPresetCommand() {
+            return Commands.literal("preset")
+                            .executes(NoCropTrampleCommand::showPresetStatus)
+                            .then(Commands.argument("preset", StringArgumentType.word())
+                                    .requires(source -> checkPermission(source, REQUIRED_OP_LEVEL))
+                                    .suggests((context, builder) -> {
+                                        builder.suggest("vanilla_plus");
+                                        builder.suggest("casual");
+                                        builder.suggest("hardcore");
+                                        builder.suggest("custom");
+                                        return builder.buildFuture();
+                                    })
+                                    .executes(NoCropTrampleCommand::setPresetCommand));
         }
 
         private static LiteralArgumentBuilder<CommandSourceStack> buildEmptyCommand() {
@@ -163,6 +182,8 @@ public class NoCropTrampleCommand {
             CommandSourceStack source = context.getSource();
 
             source.sendSuccess(() -> Component.literal(PREFIX + LABEL_STATUS), false);
+            source.sendSuccess(() -> Component.literal("  " + LABEL_PRESET)
+                .append(Component.literal(ModConfig.getActivePreset().name()).withStyle(ChatFormatting.GOLD)), false);
             source.sendSuccess(() -> Component.literal("  " + LABEL_EMPTY)
                 .append(getStatusText(ModConfig.isPreventEmptyTrampling())), false);
             source.sendSuccess(() -> Component.literal("  " + LABEL_PLAYER)
@@ -187,6 +208,43 @@ public class NoCropTrampleCommand {
                 .append(getStatusText(ModConfig.isEnableSound())), false);
             source.sendSuccess(() -> Component.literal("  " + LABEL_ACTION_BAR)
                 .append(getStatusText(ModConfig.isEnableActionBarMessage())), false);
+
+            return 1;
+        }
+
+        private static int showPresetStatus(CommandContext<CommandSourceStack> context) {
+            CommandSourceStack source = context.getSource();
+            source.sendSuccess(
+                    () -> Component.literal(PREFIX + LABEL_PRESET)
+                            .append(Component.literal(ModConfig.getActivePreset().name()).withStyle(ChatFormatting.GOLD)),
+                    false);
+            return 1;
+        }
+
+        private static int setPresetCommand(CommandContext<CommandSourceStack> context) {
+            CommandSourceStack source = context.getSource();
+            String presetName = StringArgumentType.getString(context, "preset");
+
+            ModConfig.ModPreset selectedPreset = null;
+            for (ModConfig.ModPreset preset : ModConfig.ModPreset.values()) {
+                if (preset.name().equalsIgnoreCase(presetName)) {
+                    selectedPreset = preset;
+                    break;
+                }
+            }
+
+            if (selectedPreset == null) {
+                source.sendFailure(Component.literal(PREFIX_ERROR + "Invalid preset! Use 'vanilla_plus', 'casual', 'hardcore', or 'custom'."));
+                return 0;
+            }
+
+            ModConfig.setPreset(selectedPreset);
+
+            final ModConfig.ModPreset finalPreset = selectedPreset;
+            source.sendSuccess(
+                    () -> Component.literal(PREFIX + "Active Preset set to: ")
+                            .append(Component.literal(finalPreset.name()).withStyle(ChatFormatting.GOLD)),
+                    true);
 
             return 1;
         }
