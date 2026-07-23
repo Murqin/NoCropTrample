@@ -35,6 +35,15 @@ public class NoCropTrampleCommand {
         private static final String LABEL_EMPTY = "§7Empty farmland trampling prevention: ";
         private static final String LABEL_PLAYER = "§7Player trampling prevention: ";
         private static final String LABEL_MOB = "§7Mob trampling prevention: ";
+        private static final String LABEL_FEATHER_FALLING = "§7Feather Falling mode: ";
+        private static final String LABEL_LEATHER_BOOTS = "§7Protect with Leather Boots: ";
+        private static final String LABEL_PET = "§7Prevent Pet Trampling: ";
+        private static final String LABEL_VILLAGER = "§7Prevent Villager Trampling: ";
+        private static final String LABEL_DEHYDRATION = "§7Prevent Dehydration: ";
+        private static final String LABEL_EMPTY_REVERSION = "§7Prevent Empty Reversion: ";
+        private static final String LABEL_PARTICLES = "§7Enable Particles: ";
+        private static final String LABEL_SOUND = "§7Enable Sound: ";
+        private static final String LABEL_ACTION_BAR = "§7Enable Action Bar Message: ";
         private static final String LABEL_ERROR = "§7Couldn't set unknown prevention type to: ";
         private static final String MSG_INVALID_STATE = "Invalid state! Use 'on' or 'off'.";
         private static final String MSG_CONFIG_RELOADED = "§aConfig reloaded!";
@@ -160,8 +169,26 @@ public class NoCropTrampleCommand {
                 .append(getStatusText(ModConfig.isPreventPlayerTrampling())), false);
             source.sendSuccess(() -> Component.literal("  " + LABEL_MOB)
                 .append(getStatusText(ModConfig.isPreventMobTrampling())), false);
+            source.sendSuccess(() -> Component.literal("  " + LABEL_FEATHER_FALLING)
+                .append(Component.literal(ModConfig.getFeatherFallingMode().name()).withStyle(ChatFormatting.GOLD)), false);
+            source.sendSuccess(() -> Component.literal("  " + LABEL_LEATHER_BOOTS)
+                .append(getStatusText(ModConfig.isProtectWithLeatherBoots())), false);
+            source.sendSuccess(() -> Component.literal("  " + LABEL_PET)
+                .append(getStatusText(ModConfig.isPreventPetTrampling())), false);
+            source.sendSuccess(() -> Component.literal("  " + LABEL_VILLAGER)
+                .append(getStatusText(ModConfig.isPreventVillagerTrampling())), false);
+            source.sendSuccess(() -> Component.literal("  " + LABEL_DEHYDRATION)
+                .append(getStatusText(ModConfig.isPreventDehydration())), false);
+            source.sendSuccess(() -> Component.literal("  " + LABEL_EMPTY_REVERSION)
+                .append(getStatusText(ModConfig.isPreventEmptyReversion())), false);
+            source.sendSuccess(() -> Component.literal("  " + LABEL_PARTICLES)
+                .append(getStatusText(ModConfig.isEnableParticles())), false);
+            source.sendSuccess(() -> Component.literal("  " + LABEL_SOUND)
+                .append(getStatusText(ModConfig.isEnableSound())), false);
+            source.sendSuccess(() -> Component.literal("  " + LABEL_ACTION_BAR)
+                .append(getStatusText(ModConfig.isEnableActionBarMessage())), false);
 
-                return 1;
+            return 1;
         }
 
         /**
