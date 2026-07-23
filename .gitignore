@@ -28,3 +28,7 @@ crash-reports/
 
 # Cache
 .gemini/
+
+# Antigravity specs and plans
+docs/superpowers/
+EXPANDED_FEATURES_DESIGN.md
