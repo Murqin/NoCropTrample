@@ -14,7 +14,7 @@ repositories {
 	// TerraformersMC for Mod Menu
 	maven {
 		name = "TerraformersMC"
-		url = "https://maven.terraformersmc.com/"
+		url = "https://maven.terraformersmc.com/releases/"
 	}
 }
 

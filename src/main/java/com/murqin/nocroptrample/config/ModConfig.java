@@ -18,6 +18,12 @@ import java.nio.file.Path;
  * </p>
  */
 public class ModConfig {
+    public enum FeatherFallingMode {
+        DISABLED,
+        ANY_LEVEL,
+        SCALED
+    }
+
     private static final Gson GSON = new GsonBuilder()
             .setPrettyPrinting()
             .registerTypeAdapter(ConfigData.class, (InstanceCreator<ConfigData>) type -> new ConfigData())
@@ -30,6 +36,16 @@ public class ModConfig {
     private static boolean preventPlayerTrampling = true;
     private static boolean preventMobTrampling = true;
     private static boolean preventEmptyTrampling = true;
+    private static FeatherFallingMode featherFallingMode = FeatherFallingMode.ANY_LEVEL;
+    private static boolean protectWithLeatherBoots = true;
+    private static boolean preventPetTrampling = true;
+    private static boolean preventVillagerTrampling = true;
+    private static boolean preventDehydration = false;
+    private static boolean preventEmptyReversion = false;
+    private static boolean enableParticles = true;
+    private static boolean enableSound = true;
+    private static boolean enableActionBarMessage = false;
+    private static int actionBarCooldownSeconds = 3;
 
     /**
      * Gets whether empty trampling prevention is enabled.
@@ -50,7 +66,6 @@ public class ModConfig {
         preventEmptyTrampling = value;
         save();
     }
-
 
     /**
      * Gets whether player trampling prevention is enabled.
@@ -92,6 +107,96 @@ public class ModConfig {
         save();
     }
 
+    public static FeatherFallingMode getFeatherFallingMode() {
+        return featherFallingMode;
+    }
+
+    public static void setFeatherFallingMode(FeatherFallingMode value) {
+        featherFallingMode = value != null ? value : FeatherFallingMode.ANY_LEVEL;
+        save();
+    }
+
+    public static boolean isProtectWithLeatherBoots() {
+        return protectWithLeatherBoots;
+    }
+
+    public static void setProtectWithLeatherBoots(boolean value) {
+        protectWithLeatherBoots = value;
+        save();
+    }
+
+    public static boolean isPreventPetTrampling() {
+        return preventPetTrampling;
+    }
+
+    public static void setPreventPetTrampling(boolean value) {
+        preventPetTrampling = value;
+        save();
+    }
+
+    public static boolean isPreventVillagerTrampling() {
+        return preventVillagerTrampling;
+    }
+
+    public static void setPreventVillagerTrampling(boolean value) {
+        preventVillagerTrampling = value;
+        save();
+    }
+
+    public static boolean isPreventDehydration() {
+        return preventDehydration;
+    }
+
+    public static void setPreventDehydration(boolean value) {
+        preventDehydration = value;
+        save();
+    }
+
+    public static boolean isPreventEmptyReversion() {
+        return preventEmptyReversion;
+    }
+
+    public static void setPreventEmptyReversion(boolean value) {
+        preventEmptyReversion = value;
+        save();
+    }
+
+    public static boolean isEnableParticles() {
+        return enableParticles;
+    }
+
+    public static void setEnableParticles(boolean value) {
+        enableParticles = value;
+        save();
+    }
+
+    public static boolean isEnableSound() {
+        return enableSound;
+    }
+
+    public static void setEnableSound(boolean value) {
+        enableSound = value;
+        save();
+    }
+
+    public static boolean isEnableActionBarMessage() {
+        return enableActionBarMessage;
+    }
+
+    public static void setEnableActionBarMessage(boolean value) {
+        enableActionBarMessage = value;
+        save();
+    }
+
+    public static int getActionBarCooldownSeconds() {
+        return actionBarCooldownSeconds;
+    }
+
+    public static void setActionBarCooldownSeconds(int value) {
+        actionBarCooldownSeconds = value;
+        save();
+    }
+
     /**
      * Loads configuration from disk.
      * If the config file doesn't exist, creates a new one with default values.
@@ -105,6 +210,16 @@ public class ModConfig {
                     preventPlayerTrampling = data.preventPlayerTrampling;
                     preventMobTrampling = data.preventMobTrampling;
                     preventEmptyTrampling = data.preventEmptyTrampling;
+                    featherFallingMode = data.featherFallingMode != null ? data.featherFallingMode : FeatherFallingMode.ANY_LEVEL;
+                    protectWithLeatherBoots = data.protectWithLeatherBoots;
+                    preventPetTrampling = data.preventPetTrampling;
+                    preventVillagerTrampling = data.preventVillagerTrampling;
+                    preventDehydration = data.preventDehydration;
+                    preventEmptyReversion = data.preventEmptyReversion;
+                    enableParticles = data.enableParticles;
+                    enableSound = data.enableSound;
+                    enableActionBarMessage = data.enableActionBarMessage;
+                    actionBarCooldownSeconds = data.actionBarCooldownSeconds;
                 }
                 NoCropTrampleMod.LOGGER.info("Config loaded from {}", CONFIG_PATH);
             } catch (IOException e) {
@@ -124,6 +239,16 @@ public class ModConfig {
             data.preventPlayerTrampling = preventPlayerTrampling;
             data.preventMobTrampling = preventMobTrampling;
             data.preventEmptyTrampling = preventEmptyTrampling;
+            data.featherFallingMode = featherFallingMode;
+            data.protectWithLeatherBoots = protectWithLeatherBoots;
+            data.preventPetTrampling = preventPetTrampling;
+            data.preventVillagerTrampling = preventVillagerTrampling;
+            data.preventDehydration = preventDehydration;
+            data.preventEmptyReversion = preventEmptyReversion;
+            data.enableParticles = enableParticles;
+            data.enableSound = enableSound;
+            data.enableActionBarMessage = enableActionBarMessage;
+            data.actionBarCooldownSeconds = actionBarCooldownSeconds;
 
             Files.createDirectories(CONFIG_PATH.getParent());
             Files.writeString(CONFIG_PATH, GSON.toJson(data));
@@ -140,5 +265,15 @@ public class ModConfig {
         boolean preventEmptyTrampling = true;
         boolean preventPlayerTrampling = true;
         boolean preventMobTrampling = true;
+        FeatherFallingMode featherFallingMode = FeatherFallingMode.ANY_LEVEL;
+        boolean protectWithLeatherBoots = true;
+        boolean preventPetTrampling = true;
+        boolean preventVillagerTrampling = true;
+        boolean preventDehydration = false;
+        boolean preventEmptyReversion = false;
+        boolean enableParticles = true;
+        boolean enableSound = true;
+        boolean enableActionBarMessage = false;
+        int actionBarCooldownSeconds = 3;
     }
 }
