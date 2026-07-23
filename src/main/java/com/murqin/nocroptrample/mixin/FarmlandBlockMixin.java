@@ -14,6 +14,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.AttachedStemBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CropBlock;
@@ -24,6 +25,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
  * Mixin for FarmlandBlock to prevent trampling based on configuration.
@@ -38,10 +40,25 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class FarmlandBlockMixin {
 
     /**
-     * Injects at the HEAD of turnToDirt to intercept trampling attempts.
+     * Injects at the HEAD of isNearWater to simulate water proximity when preventDehydration is enabled.
+     *
+     * @param level the level reader
+     * @param pos   the farmland block position
+     * @param cir   callback info for returning a boolean value
+     */
+    @Inject(method = "isNearWater", at = @At("HEAD"), cancellable = true)
+    private static void onIsNearWater(LevelReader level, BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
+        if (ModConfig.isPreventDehydration()) {
+            cir.setReturnValue(true);
+        }
+    }
+
+    /**
+     * Injects at the HEAD of turnToDirt to intercept trampling attempts and empty farmland reversion.
      * <p>
      * This injection runs before farmland converts to dirt. If the entity is
-     * null (natural conversion like dehydration), the method proceeds normally.
+     * null (natural conversion like dehydration or no crops above), it checks
+     * whether empty reversion prevention is enabled.
      * Otherwise, it checks configuration to determine if trampling should be
      * prevented based on entity type and enchantment/equipment checks.
      * </p>
@@ -55,7 +72,9 @@ public abstract class FarmlandBlockMixin {
     @Inject(method = "turnToDirt", at = @At("HEAD"), cancellable = true)
     private static void onTurnToDirt(Entity entity, BlockState state, Level level, BlockPos pos, CallbackInfo ci) {
         if (entity == null) {
-            // Allow natural conversion (dehydration etc.)
+            if (ModConfig.isPreventEmptyReversion()) {
+                ci.cancel();
+            }
             return;
         }
 
