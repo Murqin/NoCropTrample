@@ -52,69 +52,63 @@ public class ModMenuIntegration implements ModMenuApi {
             int centerX = this.width / 2;
             int leftX = centerX - 155;
             int rightX = centerX + 5;
-            int startY = 32;
             int buttonWidth = 150;
             int buttonHeight = 20;
-            int rowSpacing = 24;
 
-            // Preset Button
+            // Category 1: Preset (top centered button)
             this.presetButton = this.addRenderableWidget(Button.builder(getPresetButtonText(), this::cyclePreset)
-                    .bounds(centerX - 100, startY, 200, buttonHeight)
+                    .bounds(centerX - 100, 20, 200, buttonHeight)
                     .build());
 
-            // Row 1
-            this.emptyButton = this.addRenderableWidget(Button.builder(getEmptyButtonText(), this::toggleEmptyTrampling)
-                    .bounds(leftX, startY + rowSpacing, buttonWidth, buttonHeight)
-                    .build());
+            // Category 2: Player & Footwear
             this.playerButton = this.addRenderableWidget(Button.builder(getPlayerButtonText(), this::togglePlayerTrampling)
-                    .bounds(rightX, startY + rowSpacing, buttonWidth, buttonHeight)
-                    .build());
-
-            // Row 2
-            this.mobButton = this.addRenderableWidget(Button.builder(getMobButtonText(), this::toggleMobTrampling)
-                    .bounds(leftX, startY + rowSpacing * 2, buttonWidth, buttonHeight)
+                    .bounds(leftX, 56, buttonWidth, buttonHeight)
                     .build());
             this.featherFallingButton = this.addRenderableWidget(Button.builder(getFeatherFallingButtonText(), this::cycleFeatherFalling)
-                    .bounds(rightX, startY + rowSpacing * 2, buttonWidth, buttonHeight)
+                    .bounds(rightX, 56, buttonWidth, buttonHeight)
+                    .build());
+            this.leatherBootsButton = this.addRenderableWidget(Button.builder(getLeatherBootsButtonText(), this::toggleLeatherBoots)
+                    .bounds(leftX, 80, buttonWidth, buttonHeight)
                     .build());
 
-            // Row 3
-            this.leatherBootsButton = this.addRenderableWidget(Button.builder(getLeatherBootsButtonText(), this::toggleLeatherBoots)
-                    .bounds(leftX, startY + rowSpacing * 3, buttonWidth, buttonHeight)
+            // Category 3: Entity Protection
+            this.mobButton = this.addRenderableWidget(Button.builder(getMobButtonText(), this::toggleMobTrampling)
+                    .bounds(leftX, 116, buttonWidth, buttonHeight)
                     .build());
             this.petButton = this.addRenderableWidget(Button.builder(getPetButtonText(), this::togglePetTrampling)
-                    .bounds(rightX, startY + rowSpacing * 3, buttonWidth, buttonHeight)
+                    .bounds(rightX, 116, buttonWidth, buttonHeight)
                     .build());
-
-            // Row 4
             this.villagerButton = this.addRenderableWidget(Button.builder(getVillagerButtonText(), this::toggleVillagerTrampling)
-                    .bounds(leftX, startY + rowSpacing * 4, buttonWidth, buttonHeight)
+                    .bounds(leftX, 140, buttonWidth, buttonHeight)
                     .build());
+            this.emptyButton = this.addRenderableWidget(Button.builder(getEmptyButtonText(), this::toggleEmptyTrampling)
+                    .bounds(rightX, 140, buttonWidth, buttonHeight)
+                    .build());
+
+            // Category 4: Farmland Maintenance
             this.dehydrationButton = this.addRenderableWidget(Button.builder(getDehydrationButtonText(), this::toggleDehydration)
-                    .bounds(rightX, startY + rowSpacing * 4, buttonWidth, buttonHeight)
+                    .bounds(leftX, 176, buttonWidth, buttonHeight)
                     .build());
-
-            // Row 5
             this.emptyReversionButton = this.addRenderableWidget(Button.builder(getEmptyReversionButtonText(), this::toggleEmptyReversion)
-                    .bounds(leftX, startY + rowSpacing * 5, buttonWidth, buttonHeight)
-                    .build());
-            this.particlesButton = this.addRenderableWidget(Button.builder(getParticlesButtonText(), this::toggleParticles)
-                    .bounds(rightX, startY + rowSpacing * 5, buttonWidth, buttonHeight)
+                    .bounds(rightX, 176, buttonWidth, buttonHeight)
                     .build());
 
-            // Row 6
+            // Category 5: Visual & Sound Effects
+            this.particlesButton = this.addRenderableWidget(Button.builder(getParticlesButtonText(), this::toggleParticles)
+                    .bounds(leftX, 212, buttonWidth, buttonHeight)
+                    .build());
             this.soundButton = this.addRenderableWidget(Button.builder(getSoundButtonText(), this::toggleSound)
-                    .bounds(leftX, startY + rowSpacing * 6, buttonWidth, buttonHeight)
+                    .bounds(rightX, 212, buttonWidth, buttonHeight)
                     .build());
             this.actionBarButton = this.addRenderableWidget(Button.builder(getActionBarButtonText(), this::toggleActionBar)
-                    .bounds(rightX, startY + rowSpacing * 6, buttonWidth, buttonHeight)
+                    .bounds(leftX, 236, buttonWidth, buttonHeight)
                     .build());
 
             // Done button
             this.addRenderableWidget(Button.builder(
                     Component.translatable("gui.done"),
                     button -> this.onClose())
-                    .bounds(centerX - 100, startY + rowSpacing * 7 + 4, 200, buttonHeight)
+                    .bounds(centerX - 100, 264, 200, buttonHeight)
                     .build());
         }
 
@@ -307,7 +301,14 @@ public class ModMenuIntegration implements ModMenuApi {
         @Override
         public void extractRenderState(@NonNull GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float delta) {
             super.extractRenderState(guiGraphicsExtractor, mouseX, mouseY, delta);
-            guiGraphicsExtractor.centeredText(this.font, this.title, this.width / 2, 15, 0xFFFFFF);
+            int centerX = this.width / 2;
+            guiGraphicsExtractor.centeredText(this.font, this.title, centerX, 8, 0xFFFFFF);
+
+            int headerColor = 0xFFFF55;
+            guiGraphicsExtractor.centeredText(this.font, Component.literal("Player & Footwear"), centerX, 45, headerColor);
+            guiGraphicsExtractor.centeredText(this.font, Component.literal("Entity Protection"), centerX, 105, headerColor);
+            guiGraphicsExtractor.centeredText(this.font, Component.literal("Farmland Maintenance"), centerX, 165, headerColor);
+            guiGraphicsExtractor.centeredText(this.font, Component.literal("Visual & Sound Effects"), centerX, 201, headerColor);
         }
 
         @Override
