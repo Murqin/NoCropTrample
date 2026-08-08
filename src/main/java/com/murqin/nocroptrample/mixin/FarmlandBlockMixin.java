@@ -98,6 +98,13 @@ public abstract class FarmlandBlockMixin {
             if (ModConfig.isPreventPetTrampling()) {
                 ci.cancel();
                 FeedbackHelper.triggerProtectionFeedback(level, pos, entity);
+                return;
+            }
+            // Pet-specific protection is off - fall through to the general mob rule
+            // instead of leaving pets exempt from it entirely.
+            if (ModConfig.isPreventMobTrampling()) {
+                ci.cancel();
+                FeedbackHelper.triggerProtectionFeedback(level, pos, entity);
             }
             return;
         }
@@ -105,6 +112,12 @@ public abstract class FarmlandBlockMixin {
         // Check if entity is a Villager
         if (entity instanceof Villager) {
             if (ModConfig.isPreventVillagerTrampling()) {
+                ci.cancel();
+                FeedbackHelper.triggerProtectionFeedback(level, pos, entity);
+                return;
+            }
+            // Villager-specific protection is off - fall through to the general mob rule.
+            if (ModConfig.isPreventMobTrampling()) {
                 ci.cancel();
                 FeedbackHelper.triggerProtectionFeedback(level, pos, entity);
             }
@@ -127,11 +140,11 @@ public abstract class FarmlandBlockMixin {
             // Feather Falling check
             ModConfig.FeatherFallingMode ffMode = ModConfig.getFeatherFallingMode();
             switch (ffMode) {
-                case DISABLED:
+                case ALWAYS:
                     ci.cancel();
                     FeedbackHelper.triggerProtectionFeedback(level, pos, entity);
                     break;
-                case ANY_LEVEL: {
+                case REQUIRE_FEATHER_FALLING: {
                     int ffLevel = getFeatherFallingLevel(level, player);
                     if (ffLevel > 0) {
                         ci.cancel();
@@ -139,7 +152,7 @@ public abstract class FarmlandBlockMixin {
                     }
                     break;
                 }
-                case SCALED: {
+                case SCALED_BY_LEVEL: {
                     int ffLevel = getFeatherFallingLevel(level, player);
                     if (ffLevel > 0) {
                         float chance = ffLevel * 0.25f;

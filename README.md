@@ -14,11 +14,16 @@ No Crop Trample provides robust and efficient farmland protection. Say goodbye t
 
 ## ✨ Features
 
-- **🌾 Farmland Protection:** Stops players and mobs from destroying your precious crops and reverting farmland to dirt.
-- **⚙️ Granular Configuration:** Toggle player and mob trampling independently via interactive chat commands or local JSON config files.
+- **🌾 Farmland Protection:** Stops players, mobs, pets, and villagers from destroying your precious crops and reverting farmland to dirt.
+- **⚙️ Granular Configuration:** Every setting can be toggled independently via interactive chat commands, the Mod Menu GUI, or the local JSON config file — no GUI-only settings, so dedicated servers have full control from the command line.
 - **🧱 Prevent Empty Farmland Trampling:** Option to protect empty farmland block states from being ruined by random entities.
+- **🐕 Pet & Villager Protection:** Independently protect tamed animals and villagers from triggering trampling, on top of the general mob rule.
+- **🪶 Feather Falling & Leather Boots:** Choose whether players need Feather Falling (and at what level) to be protected, or exempt anyone wearing Leather Boots regardless of enchantments.
+- **💧 Farmland Maintenance:** Optionally stop farmland from ever drying out, or stop unplanted farmland from reverting to dirt on its own.
+- **🎇 Feedback:** Optional particles, sound, and action bar messages when a trample attempt is blocked, each independently toggleable and rate-limited.
+- **📋 Presets:** Switch between curated `vanilla_plus`, `casual`, and `hardcore` profiles, or fine-tune everything as `custom`.
 - **🪶 Ultra-Lightweight:** Written utilizing efficient Fabric Mixins. Features virtually zero performance overhead, with no active ticking or entity scanning.
-- **🖥️ Server-Side Only Compatible:** Works purely on the server side; client installation is completely optional (though recommended for GUI configurations).
+- **🖥️ Server-Side Only Compatible:** Works purely on the server side; client installation is completely optional (though recommended for GUI configurations). Note that Mod Menu edits are client-side only and have no effect unless you are hosting the server yourself — see the "Multiplayer note" below.
 
 ---
 
@@ -34,24 +39,54 @@ No Crop Trample provides robust and efficient farmland protection. Say goodbye t
 ## ⚙️ Configuration & Commands
 
 ### Interactive Admin Commands
-*Requires Operator (OP) permission level 4.*
+*Requires Operator (OP) permission level 2.*
 
-- `/nocroptrample status` - Query current active protection configurations.
+- `/nocroptrample status` - Query current active protection configuration (all settings).
+- `/nocroptrample preset [vanilla_plus|casual|hardcore|custom]` - View or switch the active preset.
 - `/nocroptrample empty <on|off>` - Toggle trampling protection specifically for unplanted (empty) farmland.
 - `/nocroptrample player <on|off>` - Toggle trampling protection for players.
 - `/nocroptrample mob <on|off>` - Toggle trampling protection for hostile and passive mobs.
+- `/nocroptrample pet <on|off>` - Toggle trampling protection for tamed animals.
+- `/nocroptrample villager <on|off>` - Toggle trampling protection for villagers.
+- `/nocroptrample featherfalling [always|require_feather_falling|scaled_by_level]` - View or set the Feather Falling requirement for player protection.
+- `/nocroptrample leatherboots <on|off>` - Toggle the Leather Boots exemption for players.
+- `/nocroptrample dehydration <on|off>` - Toggle whether farmland is prevented from drying out (see the note below).
+- `/nocroptrample emptyreversion <on|off>` - Toggle whether unplanted farmland is prevented from reverting to dirt on its own.
+- `/nocroptrample particles <on|off>` - Toggle particle feedback on blocked trample attempts.
+- `/nocroptrample sound <on|off>` - Toggle sound feedback on blocked trample attempts.
+- `/nocroptrample actionbar <on|off>` - Toggle the action bar message on blocked trample attempts.
+- `/nocroptrample cooldown <0-60>` - Set the feedback cooldown, in seconds, shared by particles/sound (per block) and the action bar message (per player).
 - `/nocroptrample reload` - Force hot-reload configuration changes from disk.
+
+Running any toggle command without an argument (e.g. `/nocroptrample pet`) shows its current value instead of changing it.
 
 ### Local Configuration File
 Saved under `config/nocroptrample.json` in your server directory:
 
 ```json
 {
-  "preventEmptyTrampling": true,
+  "activePreset": "CUSTOM",
   "preventPlayerTrampling": true,
-  "preventMobTrampling": true
+  "preventMobTrampling": false,
+  "preventEmptyTrampling": false,
+  "featherFallingMode": "ALWAYS",
+  "protectWithLeatherBoots": true,
+  "preventPetTrampling": true,
+  "preventVillagerTrampling": true,
+  "preventDehydration": false,
+  "preventEmptyReversion": false,
+  "enableParticles": true,
+  "enableSound": false,
+  "enableActionBarMessage": false,
+  "actionBarCooldownSeconds": 3
 }
 ```
+
+### 💧 A note on `preventDehydration`
+Enabling this stops farmland from ever drying out — but since dry farmland halves crop growth chance in vanilla, this also speeds up crop growth across your whole world, not just where trampling would otherwise be a concern. It's off by default for that reason; enable it deliberately if faster growth is a tradeoff you want.
+
+### 🖥️ Multiplayer note
+The Mod Menu configuration screen changes settings in the client's local config file. On a dedicated server, this only has an effect if you are the one hosting it — connecting to someone else's server and changing settings via Mod Menu will not change how that server behaves. Use the [chat commands](#interactive-admin-commands) (with OP level 2) to change a remote server's settings instead.
 
 ---
 

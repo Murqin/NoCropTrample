@@ -3,10 +3,18 @@ package com.murqin.nocroptrample;
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
 import com.murqin.nocroptrample.config.ModConfig;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.ScrollableLayout;
+import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.layouts.GridLayout;
+import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
+import net.minecraft.client.gui.layouts.LinearLayout;
+import net.minecraft.client.gui.screens.ConfirmScreen;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -22,11 +30,18 @@ public class ModMenuIntegration implements ModMenuApi {
     /**
      * Configuration screen for the NoCropTrample mod.
      * <p>
-     * Provides a simple GUI to toggle player and mob trampling prevention.
+     * Content is laid out via a scrollable {@link GridLayout} inside a
+     * {@link HeaderAndFooterLayout} so the screen stays usable regardless of window size
+     * or GUI scale - fixed pixel coordinates would push later rows (and the Done button)
+     * off-screen once the widget count grows.
      * </p>
      */
     public static class NoCropTrampleConfigScreen extends Screen {
+        private static final int BUTTON_WIDTH = 150;
+        private static final int BUTTON_HEIGHT = 20;
+
         private final Screen parent;
+        private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
 
         private Button presetButton;
         private Button emptyButton;
@@ -43,73 +58,115 @@ public class ModMenuIntegration implements ModMenuApi {
         private Button actionBarButton;
 
         public NoCropTrampleConfigScreen(Screen parent) {
-            super(Component.literal("NoCropTrample Config"));
+            super(Component.translatable("nocroptrample.config.title"));
             this.parent = parent;
         }
 
         @Override
         protected void init() {
-            int centerX = this.width / 2;
-            int leftX = centerX - 155;
-            int rightX = centerX + 5;
-            int buttonWidth = 150;
-            int buttonHeight = 20;
+            this.layout.addTitleHeader(this.title, this.font);
 
-            // Category 1: Preset (top centered button)
-            this.presetButton = this.addRenderableWidget(Button.builder(getPresetButtonText(), this::cyclePreset)
-                    .bounds(centerX - 100, 20, 200, buttonHeight)
+            this.presetButton = this.layout.addToHeader(
+                    Button.builder(getPresetButtonText(), this::cyclePreset)
+                            .size(200, BUTTON_HEIGHT)
+                            .build(),
+                    settings -> settings.alignHorizontallyCenter());
+
+            if (isConnectedToRemoteServer()) {
+                this.layout.addToHeader(
+                        new StringWidget(Component.translatable("nocroptrample.config.warning.remote_server"), this.font)
+                                .setMaxWidth(320),
+                        settings -> settings.alignHorizontallyCenter());
+            }
+
+            this.playerButton = Button.builder(getPlayerButtonText(), this::togglePlayerTrampling)
+                    .size(BUTTON_WIDTH, BUTTON_HEIGHT)
+                    .build();
+            this.featherFallingButton = Button.builder(getFeatherFallingButtonText(), this::cycleFeatherFalling)
+                    .size(BUTTON_WIDTH, BUTTON_HEIGHT)
+                    .build();
+            this.leatherBootsButton = Button.builder(getLeatherBootsButtonText(), this::toggleLeatherBoots)
+                    .size(BUTTON_WIDTH, BUTTON_HEIGHT)
+                    .build();
+
+            this.mobButton = Button.builder(getMobButtonText(), this::toggleMobTrampling)
+                    .size(BUTTON_WIDTH, BUTTON_HEIGHT)
+                    .build();
+            this.petButton = Button.builder(getPetButtonText(), this::togglePetTrampling)
+                    .size(BUTTON_WIDTH, BUTTON_HEIGHT)
+                    .build();
+            this.villagerButton = Button.builder(getVillagerButtonText(), this::toggleVillagerTrampling)
+                    .size(BUTTON_WIDTH, BUTTON_HEIGHT)
+                    .build();
+            this.emptyButton = Button.builder(getEmptyButtonText(), this::toggleEmptyTrampling)
+                    .size(BUTTON_WIDTH, BUTTON_HEIGHT)
+                    .build();
+
+            this.dehydrationButton = Button.builder(getDehydrationButtonText(), this::toggleDehydration)
+                    .tooltip(Tooltip.create(Component.translatable("nocroptrample.config.button.dehydration.tooltip")))
+                    .size(BUTTON_WIDTH, BUTTON_HEIGHT)
+                    .build();
+            this.emptyReversionButton = Button.builder(getEmptyReversionButtonText(), this::toggleEmptyReversion)
+                    .size(BUTTON_WIDTH, BUTTON_HEIGHT)
+                    .build();
+
+            this.particlesButton = Button.builder(getParticlesButtonText(), this::toggleParticles)
+                    .size(BUTTON_WIDTH, BUTTON_HEIGHT)
+                    .build();
+            this.soundButton = Button.builder(getSoundButtonText(), this::toggleSound)
+                    .size(BUTTON_WIDTH, BUTTON_HEIGHT)
+                    .build();
+            this.actionBarButton = Button.builder(getActionBarButtonText(), this::toggleActionBar)
+                    .size(BUTTON_WIDTH, BUTTON_HEIGHT)
+                    .build();
+
+            LinearLayout content = LinearLayout.vertical().spacing(10);
+            content.addChild(buildCategory("nocroptrample.config.category.player_footwear", this.playerButton, this.featherFallingButton, this.leatherBootsButton));
+            content.addChild(buildCategory("nocroptrample.config.category.entity_protection", this.mobButton, this.petButton, this.villagerButton, this.emptyButton));
+            content.addChild(buildCategory("nocroptrample.config.category.farmland_maintenance", this.dehydrationButton, this.emptyReversionButton));
+            content.addChild(buildCategory("nocroptrample.config.category.visual_sound", this.particlesButton, this.soundButton, this.actionBarButton));
+
+            ScrollableLayout scrollable = new ScrollableLayout(this.minecraft, content, this.layout.getContentHeight());
+            this.layout.addToContents(scrollable);
+
+            this.layout.addToFooter(Button.builder(Component.translatable("gui.done"), button -> this.onClose())
+                    .size(200, BUTTON_HEIGHT)
                     .build());
 
-            // Category 2: Player & Footwear
-            this.playerButton = this.addRenderableWidget(Button.builder(getPlayerButtonText(), this::togglePlayerTrampling)
-                    .bounds(leftX, 56, buttonWidth, buttonHeight)
-                    .build());
-            this.featherFallingButton = this.addRenderableWidget(Button.builder(getFeatherFallingButtonText(), this::cycleFeatherFalling)
-                    .bounds(rightX, 56, buttonWidth, buttonHeight)
-                    .build());
-            this.leatherBootsButton = this.addRenderableWidget(Button.builder(getLeatherBootsButtonText(), this::toggleLeatherBoots)
-                    .bounds(leftX, 80, buttonWidth, buttonHeight)
-                    .build());
+            this.layout.visitWidgets(this::addRenderableWidget);
+            this.repositionElements();
+        }
 
-            // Category 3: Entity Protection
-            this.mobButton = this.addRenderableWidget(Button.builder(getMobButtonText(), this::toggleMobTrampling)
-                    .bounds(leftX, 116, buttonWidth, buttonHeight)
-                    .build());
-            this.petButton = this.addRenderableWidget(Button.builder(getPetButtonText(), this::togglePetTrampling)
-                    .bounds(rightX, 116, buttonWidth, buttonHeight)
-                    .build());
-            this.villagerButton = this.addRenderableWidget(Button.builder(getVillagerButtonText(), this::toggleVillagerTrampling)
-                    .bounds(leftX, 140, buttonWidth, buttonHeight)
-                    .build());
-            this.emptyButton = this.addRenderableWidget(Button.builder(getEmptyButtonText(), this::toggleEmptyTrampling)
-                    .bounds(rightX, 140, buttonWidth, buttonHeight)
-                    .build());
+        @Override
+        protected void repositionElements() {
+            this.layout.arrangeElements();
+        }
 
-            // Category 4: Farmland Maintenance
-            this.dehydrationButton = this.addRenderableWidget(Button.builder(getDehydrationButtonText(), this::toggleDehydration)
-                    .bounds(leftX, 176, buttonWidth, buttonHeight)
-                    .build());
-            this.emptyReversionButton = this.addRenderableWidget(Button.builder(getEmptyReversionButtonText(), this::toggleEmptyReversion)
-                    .bounds(rightX, 176, buttonWidth, buttonHeight)
-                    .build());
+        /**
+         * Builds a titled, two-column group of toggle buttons.
+         *
+         * @param categoryTitleKey the translation key for the header shown above the buttons
+         * @param buttons          the buttons belonging to this category
+         * @return a vertical layout containing the header and a button grid
+         */
+        private LinearLayout buildCategory(String categoryTitleKey, Button... buttons) {
+            LinearLayout category = LinearLayout.vertical().spacing(4);
+            category.addChild(
+                    new StringWidget(Component.translatable(categoryTitleKey).withStyle(ChatFormatting.YELLOW), this.font),
+                    settings -> settings.alignHorizontallyCenter());
 
-            // Category 5: Visual & Sound Effects
-            this.particlesButton = this.addRenderableWidget(Button.builder(getParticlesButtonText(), this::toggleParticles)
-                    .bounds(leftX, 212, buttonWidth, buttonHeight)
-                    .build());
-            this.soundButton = this.addRenderableWidget(Button.builder(getSoundButtonText(), this::toggleSound)
-                    .bounds(rightX, 212, buttonWidth, buttonHeight)
-                    .build());
-            this.actionBarButton = this.addRenderableWidget(Button.builder(getActionBarButtonText(), this::toggleActionBar)
-                    .bounds(leftX, 236, buttonWidth, buttonHeight)
-                    .build());
+            GridLayout grid = new GridLayout().columnSpacing(10).rowSpacing(4);
+            GridLayout.RowHelper rowHelper = grid.createRowHelper(2);
+            for (Button button : buttons) {
+                rowHelper.addChild(button);
+            }
+            category.addChild(grid, settings -> settings.alignHorizontallyCenter());
 
-            // Done button
-            this.addRenderableWidget(Button.builder(
-                    Component.translatable("gui.done"),
-                    button -> this.onClose())
-                    .bounds(centerX - 100, 264, 200, buttonHeight)
-                    .build());
+            return category;
+        }
+
+        private boolean isConnectedToRemoteServer() {
+            return this.minecraft != null && this.minecraft.level != null && !this.minecraft.hasSingleplayerServer();
         }
 
         private void updateButtonLabels() {
@@ -136,7 +193,27 @@ public class ModMenuIntegration implements ModMenuApi {
                 case HARDCORE -> ModConfig.ModPreset.CUSTOM;
                 case CUSTOM -> ModConfig.ModPreset.VANILLA_PLUS;
             };
-            ModConfig.setPreset(next);
+
+            if (current == ModConfig.ModPreset.CUSTOM && this.minecraft != null) {
+                // Leaving CUSTOM overwrites whatever the player fine-tuned with the next preset's
+                // values, so confirm first instead of silently discarding it.
+                this.minecraft.setScreenAndShow(new ConfirmScreen(
+                        confirmed -> {
+                            this.minecraft.setScreenAndShow(this);
+                            if (confirmed) {
+                                applyPreset(next);
+                            }
+                        },
+                        Component.translatable("nocroptrample.config.confirm.overwrite_custom.title"),
+                        Component.translatable("nocroptrample.config.confirm.overwrite_custom.message")));
+                return;
+            }
+
+            applyPreset(next);
+        }
+
+        private void applyPreset(ModConfig.ModPreset preset) {
+            ModConfig.setPreset(preset);
             updateButtonLabels();
         }
 
@@ -158,9 +235,9 @@ public class ModMenuIntegration implements ModMenuApi {
         private void cycleFeatherFalling(Button button) {
             ModConfig.FeatherFallingMode current = ModConfig.getFeatherFallingMode();
             ModConfig.FeatherFallingMode next = switch (current) {
-                case DISABLED -> ModConfig.FeatherFallingMode.ANY_LEVEL;
-                case ANY_LEVEL -> ModConfig.FeatherFallingMode.SCALED;
-                case SCALED -> ModConfig.FeatherFallingMode.DISABLED;
+                case ALWAYS -> ModConfig.FeatherFallingMode.REQUIRE_FEATHER_FALLING;
+                case REQUIRE_FEATHER_FALLING -> ModConfig.FeatherFallingMode.SCALED_BY_LEVEL;
+                case SCALED_BY_LEVEL -> ModConfig.FeatherFallingMode.ALWAYS;
             };
             ModConfig.setFeatherFallingMode(next);
             updateButtonLabels();
@@ -206,109 +283,89 @@ public class ModMenuIntegration implements ModMenuApi {
             updateButtonLabels();
         }
 
-        private @NonNull Component getPresetButtonText() {
-            String name = switch (ModConfig.getActivePreset()) {
-                case VANILLA_PLUS -> "Vanilla+";
-                case CASUAL -> "Casual";
-                case HARDCORE -> "Hardcore";
-                case CUSTOM -> "Custom";
+        private static @NonNull Component enabledStatus(boolean enabled) {
+            return enabled
+                    ? Component.translatable("nocroptrample.status.enabled").withStyle(ChatFormatting.GREEN)
+                    : Component.translatable("nocroptrample.status.disabled").withStyle(ChatFormatting.RED);
+        }
+
+        private static @NonNull Component preventedStatus(boolean prevented) {
+            return prevented
+                    ? Component.translatable("nocroptrample.status.prevented").withStyle(ChatFormatting.GREEN)
+                    : Component.translatable("nocroptrample.status.allowed").withStyle(ChatFormatting.RED);
+        }
+
+        private static @NonNull MutableComponent presetName(ModConfig.ModPreset preset) {
+            String key = switch (preset) {
+                case VANILLA_PLUS -> "nocroptrample.preset.vanilla_plus";
+                case CASUAL -> "nocroptrample.preset.casual";
+                case HARDCORE -> "nocroptrample.preset.hardcore";
+                case CUSTOM -> "nocroptrample.preset.custom";
             };
-            return Component.literal("Preset: ").append(Component.literal(name).withStyle(net.minecraft.ChatFormatting.GOLD));
+            return Component.translatable(key);
+        }
+
+        private static @NonNull MutableComponent featherFallingModeName(ModConfig.FeatherFallingMode mode) {
+            String key = switch (mode) {
+                case ALWAYS -> "nocroptrample.feather_falling.always";
+                case REQUIRE_FEATHER_FALLING -> "nocroptrample.feather_falling.require_feather_falling";
+                case SCALED_BY_LEVEL -> "nocroptrample.feather_falling.scaled_by_level";
+            };
+            return Component.translatable(key);
+        }
+
+        private @NonNull Component getPresetButtonText() {
+            return Component.translatable("nocroptrample.config.button.preset")
+                    .append(presetName(ModConfig.getActivePreset()).withStyle(ChatFormatting.GOLD));
         }
 
         private @NonNull Component getEmptyButtonText() {
-            return Component.literal("Empty Trampling: ")
-                    .append(ModConfig.isPreventEmptyTrampling()
-                            ? Component.literal("§aPrevented")
-                            : Component.literal("§cAllowed"));
+            return Component.translatable("nocroptrample.config.button.empty").append(preventedStatus(ModConfig.isPreventEmptyTrampling()));
         }
 
         private @NonNull Component getPlayerButtonText() {
-            return Component.literal("Player Trampling: ")
-                    .append(ModConfig.isPreventPlayerTrampling()
-                            ? Component.literal("§aPrevented")
-                            : Component.literal("§cAllowed"));
+            return Component.translatable("nocroptrample.config.button.player").append(preventedStatus(ModConfig.isPreventPlayerTrampling()));
         }
 
         private @NonNull Component getMobButtonText() {
-            return Component.literal("Mob Trampling: ")
-                    .append(ModConfig.isPreventMobTrampling()
-                            ? Component.literal("§aPrevented")
-                            : Component.literal("§cAllowed"));
+            return Component.translatable("nocroptrample.config.button.mob").append(preventedStatus(ModConfig.isPreventMobTrampling()));
         }
 
         private @NonNull Component getFeatherFallingButtonText() {
-            return Component.literal("Feather Falling: ")
-                    .append(Component.literal("§e" + ModConfig.getFeatherFallingMode().name()));
+            return Component.translatable("nocroptrample.config.button.feather_falling")
+                    .append(featherFallingModeName(ModConfig.getFeatherFallingMode()).withStyle(ChatFormatting.YELLOW));
         }
 
         private @NonNull Component getLeatherBootsButtonText() {
-            return Component.literal("Leather Boots: ")
-                    .append(ModConfig.isProtectWithLeatherBoots()
-                            ? Component.literal("§aEnabled")
-                            : Component.literal("§cDisabled"));
+            return Component.translatable("nocroptrample.config.button.leather_boots").append(enabledStatus(ModConfig.isProtectWithLeatherBoots()));
         }
 
         private @NonNull Component getPetButtonText() {
-            return Component.literal("Pet Trampling: ")
-                    .append(ModConfig.isPreventPetTrampling()
-                            ? Component.literal("§aPrevented")
-                            : Component.literal("§cAllowed"));
+            return Component.translatable("nocroptrample.config.button.pet").append(preventedStatus(ModConfig.isPreventPetTrampling()));
         }
 
         private @NonNull Component getVillagerButtonText() {
-            return Component.literal("Villager Trampling: ")
-                    .append(ModConfig.isPreventVillagerTrampling()
-                            ? Component.literal("§aPrevented")
-                            : Component.literal("§cAllowed"));
+            return Component.translatable("nocroptrample.config.button.villager").append(preventedStatus(ModConfig.isPreventVillagerTrampling()));
         }
 
         private @NonNull Component getDehydrationButtonText() {
-            return Component.literal("Dehydration: ")
-                    .append(ModConfig.isPreventDehydration()
-                            ? Component.literal("§aPrevented")
-                            : Component.literal("§cAllowed"));
+            return Component.translatable("nocroptrample.config.button.dehydration").append(preventedStatus(ModConfig.isPreventDehydration()));
         }
 
         private @NonNull Component getEmptyReversionButtonText() {
-            return Component.literal("Empty Reversion: ")
-                    .append(ModConfig.isPreventEmptyReversion()
-                            ? Component.literal("§aPrevented")
-                            : Component.literal("§cAllowed"));
+            return Component.translatable("nocroptrample.config.button.empty_reversion").append(preventedStatus(ModConfig.isPreventEmptyReversion()));
         }
 
         private @NonNull Component getParticlesButtonText() {
-            return Component.literal("Particles: ")
-                    .append(ModConfig.isEnableParticles()
-                            ? Component.literal("§aEnabled")
-                            : Component.literal("§cDisabled"));
+            return Component.translatable("nocroptrample.config.button.particles").append(enabledStatus(ModConfig.isEnableParticles()));
         }
 
         private @NonNull Component getSoundButtonText() {
-            return Component.literal("Sound: ")
-                    .append(ModConfig.isEnableSound()
-                            ? Component.literal("§aEnabled")
-                            : Component.literal("§cDisabled"));
+            return Component.translatable("nocroptrample.config.button.sound").append(enabledStatus(ModConfig.isEnableSound()));
         }
 
         private @NonNull Component getActionBarButtonText() {
-            return Component.literal("Action Bar Msg: ")
-                    .append(ModConfig.isEnableActionBarMessage()
-                            ? Component.literal("§aEnabled")
-                            : Component.literal("§cDisabled"));
-        }
-
-        @Override
-        public void extractRenderState(@NonNull GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float delta) {
-            super.extractRenderState(guiGraphicsExtractor, mouseX, mouseY, delta);
-            int centerX = this.width / 2;
-            guiGraphicsExtractor.centeredText(this.font, this.title, centerX, 8, 0xFFFFFF);
-
-            int headerColor = 0xFFFF55;
-            guiGraphicsExtractor.centeredText(this.font, Component.literal("Player & Footwear"), centerX, 45, headerColor);
-            guiGraphicsExtractor.centeredText(this.font, Component.literal("Entity Protection"), centerX, 105, headerColor);
-            guiGraphicsExtractor.centeredText(this.font, Component.literal("Farmland Maintenance"), centerX, 165, headerColor);
-            guiGraphicsExtractor.centeredText(this.font, Component.literal("Visual & Sound Effects"), centerX, 201, headerColor);
+            return Component.translatable("nocroptrample.config.button.action_bar").append(enabledStatus(ModConfig.isEnableActionBarMessage()));
         }
 
         @Override

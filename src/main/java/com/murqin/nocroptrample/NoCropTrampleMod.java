@@ -2,6 +2,7 @@ package com.murqin.nocroptrample;
 
 import com.murqin.nocroptrample.command.NoCropTrampleCommand;
 import com.murqin.nocroptrample.config.ModConfig;
+import com.murqin.nocroptrample.util.FeedbackHelper;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import org.slf4j.Logger;
@@ -24,6 +25,9 @@ public class NoCropTrampleMod implements ModInitializer {
 
         // Load config
         ModConfig.load();
+
+        // Register cleanup listeners for feedback tracking
+        FeedbackHelper.init();
 
         // Register commands
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
