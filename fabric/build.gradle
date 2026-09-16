@@ -1,0 +1,53 @@
+plugins {
+	id 'net.fabricmc.fabric-loom' version "${loom_version}"
+}
+
+sourceSets {
+	main {
+		java {
+			srcDir rootProject.file('common/src/main/java')
+		}
+		resources {
+			srcDir rootProject.file('common/src/main/resources')
+		}
+	}
+}
+
+repositories {
+	// TerraformersMC for Mod Menu
+	maven {
+		name = "TerraformersMC"
+		url = "https://maven.terraformersmc.com/"
+	}
+}
+
+loom {
+	mods {
+		"nocroptrample" {
+			sourceSet sourceSets.main
+		}
+	}
+}
+
+dependencies {
+	// To change the versions see the gradle.properties file
+	minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
+
+	implementation "net.fabricmc:fabric-loader:${rootProject.loader_version}"
+
+	// Fabric API. This is technically optional, but you probably want it anyway.
+	implementation "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
+
+	// Mod Menu (optional)
+	implementation("com.terraformersmc:modmenu:${rootProject.modmenu_version}") {
+		transitive = false
+	}
+}
+
+processResources {
+	inputs.property "version", project.version
+
+	filesMatching("fabric.mod.json") {
+		expand "version": inputs.properties.version
+	}
+}

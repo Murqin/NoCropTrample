@@ -1,0 +1,27 @@
+modLoader = "javafml"
+loaderVersion = "[1,)"
+license = "MIT"
+issueTrackerURL = "https://github.com/deimos-sh/NoCropTrample/issues"
+
+[[mods]]
+modId = "nocroptrample"
+version = "${version}"
+displayName = "NoCropTrample"
+description = "Prevents farmland from being trampled by players and mobs"
+authors = "Murqin"
+displayURL = "https://github.com/deimos-sh/NoCropTrample"
+iconFile = "nocroptrample:icon.png"
+
+[[dependencies.nocroptrample]]
+    modId = "neoforge"
+    type = "required"
+    versionRange = "[26.3,)"
+    ordering = "NONE"
+    side = "BOTH"
+
+[[dependencies.nocroptrample]]
+    modId = "minecraft"
+    type = "required"
+    versionRange = "[26.3,)"
+    ordering = "NONE"
+    side = "BOTH"

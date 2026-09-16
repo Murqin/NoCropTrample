@@ -4,7 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import com.murqin.nocroptrample.NoCropTrampleMod;
+import com.murqin.nocroptrample.NoCropTrample;
 import com.murqin.nocroptrample.StateName;
 import com.murqin.nocroptrample.config.ModConfig;
 import net.minecraft.commands.Commands;
@@ -242,7 +242,7 @@ public class NoCropTrampleCommand {
                         label = LABEL_MOB;
                     }
                     default -> {
-                        NoCropTrampleMod.LOGGER.error("Tried setting state of {}, which is not a valid state!", stateName);
+                        NoCropTrample.LOGGER.error("Tried setting state of {}, which is not a valid state!", stateName);
                         label = LABEL_ERROR;
                     }
                 }

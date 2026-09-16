@@ -4,8 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import com.google.gson.JsonParseException;
-import com.murqin.nocroptrample.NoCropTrampleMod;
-import net.fabricmc.loader.api.FabricLoader;
+import com.murqin.nocroptrample.NoCropTrample;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -15,7 +14,7 @@ import java.nio.file.Path;
  * Configuration manager for the NoCropTrample mod.
  * <p>
  * Handles loading, saving, and accessing mod configuration values.
- * Config file is stored as JSON in the Fabric config directory.
+ * Config file is stored as JSON in the platform's config directory.
  * </p>
  */
 public class ModConfig {
@@ -23,14 +22,23 @@ public class ModConfig {
             .setPrettyPrinting()
             .registerTypeAdapter(ConfigData.class, (InstanceCreator<ConfigData>) type -> new ConfigData())
             .create();
-    private static final Path CONFIG_PATH = FabricLoader.getInstance()
-            .getConfigDir()
-            .resolve(NoCropTrampleMod.MOD_ID + ".json");
+
+    private static Path configPath;
 
     // Config values - encapsulated with getters/setters
     private static boolean preventPlayerTrampling = true;
     private static boolean preventMobTrampling = true;
     private static boolean preventEmptyTrampling = true;
+
+    /**
+     * Sets the directory the config file lives in. Must be called once by
+     * the platform entrypoint, before {@link #load()}.
+     *
+     * @param configDir the platform's config directory
+     */
+    public static void init(Path configDir) {
+        configPath = configDir.resolve(NoCropTrample.MOD_ID + ".json");
+    }
 
     /**
      * Gets whether empty trampling prevention is enabled.
@@ -98,18 +106,18 @@ public class ModConfig {
      * If the config file doesn't exist, creates a new one with default values.
      */
     public static void load() {
-        if (Files.exists(CONFIG_PATH)) {
+        if (Files.exists(configPath)) {
             try {
-                String json = Files.readString(CONFIG_PATH);
+                String json = Files.readString(configPath);
                 ConfigData data = GSON.fromJson(json, ConfigData.class);
                 if (data != null) {
                     preventPlayerTrampling = data.preventPlayerTrampling;
                     preventMobTrampling = data.preventMobTrampling;
                     preventEmptyTrampling = data.preventEmptyTrampling;
                 }
-                NoCropTrampleMod.LOGGER.info("Config loaded from {}", CONFIG_PATH);
+                NoCropTrample.LOGGER.info("Config loaded from {}", configPath);
             } catch (IOException | JsonParseException e) {
-                NoCropTrampleMod.LOGGER.error("Failed to load config from {}, falling back to defaults", CONFIG_PATH, e);
+                NoCropTrample.LOGGER.error("Failed to load config from {}, falling back to defaults", configPath, e);
                 preventPlayerTrampling = true;
                 preventMobTrampling = true;
                 preventEmptyTrampling = true;
@@ -129,11 +137,11 @@ public class ModConfig {
             data.preventMobTrampling = preventMobTrampling;
             data.preventEmptyTrampling = preventEmptyTrampling;
 
-            Files.createDirectories(CONFIG_PATH.getParent());
-            Files.writeString(CONFIG_PATH, GSON.toJson(data));
-            NoCropTrampleMod.LOGGER.info("Config saved to {}", CONFIG_PATH);
+            Files.createDirectories(configPath.getParent());
+            Files.writeString(configPath, GSON.toJson(data));
+            NoCropTrample.LOGGER.info("Config saved to {}", configPath);
         } catch (IOException e) {
-            NoCropTrampleMod.LOGGER.error("Failed to save config", e);
+            NoCropTrample.LOGGER.error("Failed to save config", e);
         }
     }
 

@@ -7,6 +7,7 @@
     "authors": [
         "Murqin"
     ],
+    "icon": "assets/nocroptrample/icon.png",
     "contact": {
         "homepage": "https://github.com/deimos-sh/NoCropTrample",
         "sources": "https://github.com/deimos-sh/NoCropTrample"
@@ -15,10 +16,10 @@
     "environment": "*",
     "entrypoints": {
         "main": [
-            "com.murqin.nocroptrample.NoCropTrampleMod"
+            "com.murqin.nocroptrample.fabric.NoCropTrampleFabric"
         ],
         "modmenu": [
-            "com.murqin.nocroptrample.ModMenuIntegration"
+            "com.murqin.nocroptrample.fabric.ModMenuIntegration"
         ]
     },
     "mixins": [
