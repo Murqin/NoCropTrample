@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 /**
  * Mixin for FarmlandBlock to prevent trampling based on configuration.
  * <p>
- * This mixin intercepts the {@code turnToDirt} method which converts farmland
+ * This mixin intercepts the {@code turnToBaseBlock} method which converts farmland
  * to dirt when an entity jumps or falls on it. By injecting at the HEAD with
  * cancellable=true, we can prevent the trampling behavior selectively based
  * on whether the entity is a player or mob and what the configuration allows.
@@ -29,7 +29,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class FarmlandBlockMixin {
 
     /**
-     * Injects at the HEAD of turnToDirt to intercept trampling attempts.
+     * Injects at the HEAD of turnToBaseBlock to intercept trampling attempts.
      * <p>
      * This injection runs before farmland converts to dirt. If the entity is
      * null (natural conversion like dehydration), the method proceeds normally.
@@ -43,8 +43,8 @@ public abstract class FarmlandBlockMixin {
      * @param pos    the block position
      * @param ci     callback info for cancelling the method
      */
-    @Inject(method = "turnToDirt", at = @At("HEAD"), cancellable = true)
-    private static void onTurnToDirt(Entity entity, BlockState state, Level level, BlockPos pos, CallbackInfo ci) {
+    @Inject(method = "turnToBaseBlock", at = @At("HEAD"), cancellable = true)
+    private void onTurnToDirt(Entity entity, BlockState state, Level level, BlockPos pos, CallbackInfo ci) {
         if (entity == null) {
             // Allow natural conversion (dehydration etc.)
             return;
