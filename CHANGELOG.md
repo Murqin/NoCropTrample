@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6-26.3] - 2026-09-16
+
+### New Features
+- **NeoForge support** — the mod now builds for both Fabric and NeoForge from one repository. NeoForge uses the native `BlockEvent.FarmlandTrampleEvent` instead of a mixin, so it isn't affected by Mojang renaming `FarmlandBlock`'s internal methods.
+
+### Bug Fixes
+- **Fixed the FarmlandBlock mixin failing to apply on Minecraft 26.3** — Mojang renamed the static `turnToDirt` method to an instance method `turnToBaseBlock`; the mixin target is updated accordingly. This affected only the Fabric build.
+- **Fixed a corrupted config file crashing mod initialization** — malformed JSON in `nocroptrample.json` threw an uncaught `JsonSyntaxException`; it's now caught and the mod falls back to default settings instead.
+- **Fixed modded crops not recognized as planted** — farmland below a block tagged `minecraft:crops` (but not extending the vanilla `CropBlock`/`StemBlock`/`AttachedStemBlock` classes) was misclassified as empty and governed by the wrong config option.
+
+### Technical
+- Ported to Minecraft 26.3, Fabric Loader 0.19.5, Fabric API 0.160.5+26.3, Mod Menu 21.0.0-beta.1.
+- Restructured into `common`/`fabric`/`neoforge` Gradle subprojects — shared logic (config, commands, the trampling decision, the config screen) lives in `common`; each platform keeps only its own entrypoint and event/mixin glue.
+- Wired up the mod icon in `fabric.mod.json` and `neoforge.mods.toml` — the file existed in the jar but was never referenced by either.
+
 ## [1.5-26.2] - 2026-06-22
 
 ### Bug Fixes
