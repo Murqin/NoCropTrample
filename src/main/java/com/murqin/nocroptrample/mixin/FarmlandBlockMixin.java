@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.core.BlockPos;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -51,11 +52,15 @@ public abstract class FarmlandBlockMixin {
         }
 
         boolean isPlayer = entity instanceof Player;
-        Block aboveBlock = level.getBlockState(pos.above()).getBlock();
+        BlockState aboveState = level.getBlockState(pos.above());
+        Block aboveBlock = aboveState.getBlock();
         boolean isEmpty = !(
             aboveBlock instanceof CropBlock
             || aboveBlock instanceof StemBlock
             || aboveBlock instanceof AttachedStemBlock
+            // Catches modded crops that opt into the vanilla convention instead
+            // of extending one of the classes above.
+            || aboveState.is(BlockTags.CROPS)
         );
 
         if (isEmpty) {
