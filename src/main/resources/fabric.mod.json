@@ -8,8 +8,8 @@
         "Murqin"
     ],
     "contact": {
-        "homepage": "https://github.com/Murqin/NoCropTrample",
-        "sources": "https://github.com/Murqin/NoCropTrample"
+        "homepage": "https://github.com/deimos-sh/NoCropTrample",
+        "sources": "https://github.com/deimos-sh/NoCropTrample"
     },
     "license": "MIT",
     "environment": "*",
