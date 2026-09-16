@@ -3,6 +3,7 @@ package com.murqin.nocroptrample.config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
+import com.google.gson.JsonParseException;
 import com.murqin.nocroptrample.NoCropTrampleMod;
 import net.fabricmc.loader.api.FabricLoader;
 
@@ -107,8 +108,11 @@ public class ModConfig {
                     preventEmptyTrampling = data.preventEmptyTrampling;
                 }
                 NoCropTrampleMod.LOGGER.info("Config loaded from {}", CONFIG_PATH);
-            } catch (IOException e) {
-                NoCropTrampleMod.LOGGER.error("Failed to load config, using defaults", e);
+            } catch (IOException | JsonParseException e) {
+                NoCropTrampleMod.LOGGER.error("Failed to load config from {}, falling back to defaults", CONFIG_PATH, e);
+                preventPlayerTrampling = true;
+                preventMobTrampling = true;
+                preventEmptyTrampling = true;
             }
         } else {
             save(); // Create default config
