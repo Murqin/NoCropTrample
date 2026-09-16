@@ -1,6 +1,6 @@
 # No Crop Trample
 
-A lightweight Fabric mod that prevents farmland from being trampled and reverted to dirt when players or mobs land on it.
+A lightweight mod for Fabric and NeoForge that prevents farmland from being trampled and reverted to dirt when players or mobs land on it.
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/ypxASh8R1tI" frameborder="0" allowfullscreen></iframe>
 
@@ -9,8 +9,8 @@ A lightweight Fabric mod that prevents farmland from being trampled and reverted
 - Prevents farmland blocks from reverting to dirt when entities land on them.
 - Player and mob trampling can be toggled independently.
 - Optional protection for empty (unplanted) farmland.
-- Implemented with Fabric Mixins — no tick handlers, no entity scanning.
-- Works server-side only; client install is optional (adds a ModMenu config screen).
+- No tick handlers, no entity scanning — a Fabric Mixin on Fabric, a native event listener on NeoForge.
+- Works server-side only; client install is optional (adds a config screen via ModMenu on Fabric, or NeoForge's built-in mod config screen).
 
 ## Commands
 
@@ -38,9 +38,8 @@ Config file: `config/nocroptrample.json`
 
 ## Requirements
 
-- Minecraft 26.1+
-- Fabric Loader 0.16+
-- Fabric API
+- Minecraft 26.3+
+- Fabric Loader 0.16+ and Fabric API, **or** NeoForge 26.3+
 - Java 25+
 
 ## Links

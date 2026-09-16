@@ -1,10 +1,11 @@
-# No Crop Trample (Fabric)
+# No Crop Trample
 
-A lightweight, server-side Fabric mod that prevents farmland from being trampled by players or mobs.
+A lightweight, server-side mod for Fabric and NeoForge that prevents farmland from being trampled by players or mobs.
 
 [![Platform: Fabric](https://img.shields.io/badge/Platform-Fabric-blue?style=flat-square)](#)
+[![Platform: NeoForge](https://img.shields.io/badge/Platform-NeoForge-orange?style=flat-square)](#)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
-[![Minecraft: 26.1+](https://img.shields.io/badge/Minecraft-26.1%2B-darkgreen?style=flat-square)](#)
+[![Minecraft: 26.3+](https://img.shields.io/badge/Minecraft-26.3%2B-darkgreen?style=flat-square)](#)
 
 [Demo video](https://youtu.be/ypxASh8R1tI)
 
@@ -13,15 +14,14 @@ A lightweight, server-side Fabric mod that prevents farmland from being trampled
 - Stops farmland from reverting to dirt when a player or mob lands on it.
 - Player and mob trampling can be toggled independently, via chat commands or the config file.
 - Optional protection for empty (unplanted) farmland.
-- Implemented with Fabric Mixins; no ticking or entity scanning, negligible overhead.
-- Works server-side only; client install is optional and only adds a ModMenu config screen.
+- No ticking or entity scanning on either platform (a Fabric Mixin / a native NeoForge event), negligible overhead.
+- Works server-side only; client install is optional and only adds a config screen (via ModMenu on Fabric, or NeoForge's built-in mod config screen).
 
 ## Installation
 
-1. Install [Fabric Loader](https://fabricmc.net/use/).
-2. Install [Fabric API](https://modrinth.com/mod/fabric-api).
-3. Download the mod jar from [Modrinth](https://modrinth.com/mod/nocroptrample) or [GitHub Releases](https://github.com/deimos-sh/NoCropTrample/releases).
-4. Place it in your server's `mods/` directory.
+1. Install [Fabric Loader](https://fabricmc.net/use/) + [Fabric API](https://modrinth.com/mod/fabric-api), **or** [NeoForge](https://neoforged.net/).
+2. Download the matching jar from [Modrinth](https://modrinth.com/mod/nocroptrample) or [GitHub Releases](https://github.com/deimos-sh/NoCropTrample/releases) — `nocroptrample-fabric-<version>.jar` or `nocroptrample-neoforge-<version>.jar`.
+3. Place it in your server's `mods/` directory.
 
 ## Commands
 
@@ -55,7 +55,7 @@ cd NoCropTrample
 ./gradlew build
 ```
 
-Output jar is written to `build/libs/`.
+`./gradlew build` builds both platforms — the jars land in `fabric/build/libs/` and `neoforge/build/libs/`. Use `./gradlew :fabric:build` or `./gradlew :neoforge:build` to build just one.
 
 ## License
 
