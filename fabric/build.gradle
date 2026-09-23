@@ -1,5 +1,5 @@
 plugins {
-	id 'net.fabricmc.fabric-loom' version "${loom_version}"
+	id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
 }
 
 sourceSets {
@@ -37,14 +37,15 @@ loom {
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
+	mappings loom.officialMojangMappings()
 
-	implementation "net.fabricmc:fabric-loader:${rootProject.loader_version}"
+	modImplementation "net.fabricmc:fabric-loader:${rootProject.loader_version}"
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
-	implementation "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
 
 	// Mod Menu (optional)
-	implementation("com.terraformersmc:modmenu:${rootProject.modmenu_version}") {
+	modImplementation("com.terraformersmc:modmenu:${rootProject.modmenu_version}") {
 		transitive = false
 	}
 }

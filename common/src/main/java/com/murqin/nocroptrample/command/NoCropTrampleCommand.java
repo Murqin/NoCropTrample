@@ -136,12 +136,7 @@ public class NoCropTrampleCommand {
          * @return true if the source has permission, false otherwise
          */
         private static boolean checkPermission(CommandSourceStack source, int level) {
-                net.minecraft.server.permissions.PermissionSet permissions = source.permissions();
-                if (permissions instanceof net.minecraft.server.permissions.LevelBasedPermissionSet levelBased) {
-                        return levelBased.level().isEqualOrHigherThan(
-                                net.minecraft.server.permissions.PermissionLevel.byId(level));
-                }
-                return permissions == net.minecraft.server.permissions.PermissionSet.ALL_PERMISSIONS;
+                return source.hasPermission(level);
         }
 
         /**

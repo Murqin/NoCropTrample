@@ -3,7 +3,7 @@ package com.murqin.nocroptrample.client;
 import com.murqin.nocroptrample.config.ModConfig;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import org.jspecify.annotations.NonNull;
 
@@ -118,15 +118,15 @@ public class NoCropTrampleConfigScreen extends Screen {
     }
 
     @Override
-    public void extractRenderState(@NonNull GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float delta) {
-        super.extractRenderState(guiGraphicsExtractor, mouseX, mouseY, delta);
-        guiGraphicsExtractor.centeredText(this.font, this.title, this.width / 2, 20, 0xFFFFFF);
+    public void render(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+        super.render(guiGraphics, mouseX, mouseY, delta);
+        guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 20, 0xFFFFFF);
     }
 
     @Override
     public void onClose() {
         if (this.minecraft != null) {
-            this.minecraft.setScreenAndShow(this.parent);
+            this.minecraft.setScreen(this.parent);
         }
     }
 }
