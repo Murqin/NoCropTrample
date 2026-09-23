@@ -11,6 +11,11 @@ sourceSets {
 			srcDir rootProject.file('common/src/main/resources')
 		}
 	}
+	test {
+		java {
+			srcDir rootProject.file('common/src/test/java')
+		}
+	}
 }
 
 neoForge {
