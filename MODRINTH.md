@@ -38,8 +38,8 @@ Config file: `config/nocroptrample.json`
 
 ## Requirements
 
-- Minecraft 1.21–1.21.1
-- Fabric Loader 0.16+ and Fabric API, **or** NeoForge 21.1+
+- Minecraft 1.21.11
+- Fabric Loader 0.16+ and Fabric API, **or** NeoForge 21.11+
 - Java 21+
 
 ## Links

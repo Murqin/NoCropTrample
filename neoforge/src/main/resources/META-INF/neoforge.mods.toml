@@ -15,13 +15,13 @@ iconFile = "nocroptrample:icon.png"
 [[dependencies.nocroptrample]]
     modId = "neoforge"
     type = "required"
-    versionRange = "[21.1,)"
+    versionRange = "[21.11,)"
     ordering = "NONE"
     side = "BOTH"
 
 [[dependencies.nocroptrample]]
     modId = "minecraft"
     type = "required"
-    versionRange = "[1.21,1.21.1]"
+    versionRange = "[1.21.11]"
     ordering = "NONE"
     side = "BOTH"
