@@ -9,8 +9,8 @@
     ],
     "icon": "assets/nocroptrample/icon.png",
     "contact": {
-        "homepage": "https://github.com/deimos-sh/NoCropTrample",
-        "sources": "https://github.com/deimos-sh/NoCropTrample"
+        "homepage": "https://github.com/murqin/NoCropTrample",
+        "sources": "https://github.com/murqin/NoCropTrample"
     },
     "license": "MIT",
     "environment": "*",
