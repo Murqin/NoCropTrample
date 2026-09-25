@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6+backport.1.21.11] - 2026-09-25
+
+Backport of 1.6-26.3 to Minecraft 1.21.11. The previous release for this Minecraft line was 1.0.0, so this brings every change from 1.2.0 to 1.6.
+
+### New Features
+- **NeoForge support** — the mod now builds for both Fabric and NeoForge from one repository. NeoForge uses the native `BlockEvent.FarmlandTrampleEvent` instead of a mixin.
+- **Empty farmland protection** — a new option prevents trampling of unplanted farmland. Configurable via Mod Menu or `/nocroptrample empty [on|off]`.
+- **Stem block detection** — pumpkin and melon stems, including the grown `AttachedStemBlock`, are recognized as planted crops, so farmland under them is no longer treated as empty.
+- **Modded crops** — farmland below a block tagged `minecraft:crops` is recognized as planted even when the block doesn't extend the vanilla crop classes.
+- **Command permissions** — commands that change settings (`player`, `mob`, `empty`, `reload`) now require permission level 2 (Gamemaster). Version 1.0.0 did not restrict them.
+
+### Bug Fixes
+- **Fixed a corrupted config file crashing mod initialization** — malformed JSON in `nocroptrample.json` is now caught and the mod falls back to default settings.
+- **Fixed config defaults on upgrade** — options missing from a config saved by an older version now default to enabled instead of disabled.
+
+### Technical
+- Built against Minecraft 1.21.11 and tested on Fabric and NeoForge dedicated servers and clients.
+- Uses the permission API introduced in 1.21.11 (`CommandSourceStack#permissions()`), which replaced `hasPermission(int)`.
+- Requires Fabric API 0.141.0+ or NeoForge 21.11, and Java 21.
+- Restructured into `common`/`fabric`/`neoforge` Gradle subprojects; shared logic lives in `common`, each platform keeps only its own entrypoint and event/mixin glue.
+- Wired up the mod icon in `fabric.mod.json` and `neoforge.mods.toml`.
+
 ## [1.6-26.3] - 2026-09-16
 
 ### New Features
