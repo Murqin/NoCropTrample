@@ -20,7 +20,7 @@ A lightweight, server-side mod for Fabric and NeoForge that prevents farmland fr
 ## Installation
 
 1. Install [Fabric Loader](https://fabricmc.net/use/) + [Fabric API](https://modrinth.com/mod/fabric-api), **or** [NeoForge](https://neoforged.net/).
-2. Download the matching jar from [Modrinth](https://modrinth.com/mod/nocroptrample) or [GitHub Releases](https://github.com/murqin/NoCropTrample/releases) — `nocroptrample-fabric-<version>.jar` or `nocroptrample-neoforge-<version>.jar`.
+2. Download the matching jar from [Modrinth](https://modrinth.com/mod/nocroptrample) — `nocroptrample-fabric-<version>.jar` or `nocroptrample-neoforge-<version>.jar`.
 3. Place it in your server's `mods/` directory.
 
 ## Commands
