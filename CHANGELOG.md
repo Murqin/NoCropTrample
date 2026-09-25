@@ -18,7 +18,7 @@ Backport of 1.6-26.3 to Minecraft 1.20.6–1.21.10. The previous release for the
 - **Fixed config defaults on upgrade** — options missing from a config saved by an older version now default to enabled instead of disabled.
 
 ### Technical
-- Built against Minecraft 1.21.1 and tested on Fabric and NeoForge dedicated servers running 1.20.6, 1.21, 1.21.1, 1.21.4 and 1.21.10; the versions in between share the same code but were not run individually. Minecraft 1.20.5 is not covered.
+- Built against Minecraft 1.21.1 and tested on Fabric and NeoForge dedicated servers running 1.20.6, 1.21, 1.21.1, 1.21.4 and 1.21.10, and played in game on the Fabric and NeoForge clients for 1.20.6, 1.21.1, 1.21.4 and 1.21.6; the versions in between share the same code but were not run individually. Minecraft 1.20.5 is not covered.
 - Requires Fabric API 0.97.0+ or NeoForge 20.6–21.10, and Java 21.
 - Restructured into `common`/`fabric`/`neoforge` Gradle subprojects; shared logic lives in `common`, each platform keeps only its own entrypoint and event/mixin glue.
 - Wired up the mod icon in `fabric.mod.json` and `neoforge.mods.toml`.
