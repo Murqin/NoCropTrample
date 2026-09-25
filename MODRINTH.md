@@ -44,5 +44,5 @@ Config file: `config/nocroptrample.json`
 
 ## Links
 
-- [GitHub](https://github.com/deimos-sh/NoCropTrample)
-- [Issues](https://github.com/deimos-sh/NoCropTrample/issues)
+- [GitHub](https://github.com/murqin/NoCropTrample)
+- [Issues](https://github.com/murqin/NoCropTrample/issues)
