@@ -1,0 +1,47 @@
+plugins {
+	id 'net.neoforged.moddev.legacyforge' version '2.0.147'
+}
+
+sourceSets {
+	main {
+		java {
+			srcDir rootProject.file('common/src/main/java')
+		}
+		resources {
+			srcDir rootProject.file('common/src/main/resources')
+		}
+	}
+	test {
+		java {
+			srcDir rootProject.file('common/src/test/java')
+		}
+	}
+}
+
+legacyForge {
+	// The version string carries the Minecraft version ("<mc>-<forge>"), so no separate minecraft_version is needed.
+	version = rootProject.forge_version
+
+	runs {
+		client {
+			client()
+		}
+		server {
+			server()
+		}
+	}
+
+	mods {
+		nocroptrample {
+			sourceSet sourceSets.main
+		}
+	}
+}
+
+processResources {
+	inputs.property "version", project.version
+
+	filesMatching("META-INF/mods.toml") {
+		expand "version": inputs.properties.version
+	}
+}

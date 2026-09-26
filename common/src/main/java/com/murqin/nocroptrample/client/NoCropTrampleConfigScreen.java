@@ -119,6 +119,11 @@ public class NoCropTrampleConfigScreen extends Screen {
 
     @Override
     public void render(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+        // Screen#render only draws its own background from 1.20.2 on; on 1.20.1 and earlier the
+        // previous screen stays visible behind the buttons unless we clear it out of world.
+        if (this.minecraft != null && this.minecraft.level == null) {
+            this.renderDirtBackground(guiGraphics);
+        }
         super.render(guiGraphics, mouseX, mouseY, delta);
         guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 20, 0xFFFFFF);
     }

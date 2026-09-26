@@ -11,3 +11,4 @@ rootProject.name = 'nocroptrample'
 
 include 'fabric'
 include 'neoforge'
+include 'forge'

@@ -4,10 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [1.6+backport.1.20-1.20.4] - 2026-09-26
 
-Backport of 1.6-26.3 to Minecraft 1.20–1.20.4 (Fabric) and 1.20.4 (NeoForge). There was no earlier release for this Minecraft line, so this brings every change from 1.0.0 to 1.6.
+Backport of 1.6-26.3 to Minecraft 1.20–1.20.4 (Fabric), 1.20.4 (NeoForge) and 1.20.1 (Forge). There was no earlier release for this Minecraft line, so this brings every change from 1.0.0 to 1.6.
 
 ### New Features
-- **NeoForge support** — the mod now builds for both Fabric and NeoForge from one repository. NeoForge uses the native `BlockEvent.FarmlandTrampleEvent` instead of a mixin.
+- **NeoForge and Forge support** — the mod now builds for Fabric, NeoForge and Forge from one repository. NeoForge and Forge use the native `BlockEvent.FarmlandTrampleEvent` instead of a mixin.
 - **Empty farmland protection** — a new option prevents trampling of unplanted farmland. Configurable via Mod Menu or `/nocroptrample empty [on|off]`.
 - **Stem block detection** — pumpkin and melon stems, including the grown `AttachedStemBlock`, are recognized as planted crops, so farmland under them is no longer treated as empty.
 - **Modded crops** — farmland below a block tagged `minecraft:crops` is recognized as planted even when the block doesn't extend the vanilla crop classes.
@@ -18,11 +18,13 @@ Backport of 1.6-26.3 to Minecraft 1.20–1.20.4 (Fabric) and 1.20.4 (NeoForge). 
 - **Fixed config defaults on upgrade** — options missing from a config saved by an older version now default to enabled instead of disabled.
 
 ### Technical
-- Built against Minecraft 1.20.4 and tested on Fabric dedicated servers running 1.20, 1.20.1 and 1.20.4 and a NeoForge dedicated server running 1.20.4, and played in game on the Fabric and NeoForge clients for 1.20.4; 1.20.2 and 1.20.3 share the same code, and 1.20 and 1.20.1 were not run on a client.
+- Built against Minecraft 1.20.4 (Forge: 1.20.1) and tested on Fabric dedicated servers running 1.20, 1.20.1 and 1.20.4, a NeoForge server running 1.20.4 and Forge servers running 47.1.0 and 47.4.23 (1.20.1); played in game on the Fabric client for 1.20.1 and 1.20.4, the NeoForge client for 1.20.4 and the Forge client for 1.20.1. 1.20.2 and 1.20.3 share the same code, and 1.20 was not run on a client.
 - NeoForge 20.2 and 20.3 are not covered: ModDevGradle cannot set up a dev environment for them.
-- Requires Fabric API 0.83.0+ or NeoForge 20.4, and Java 17.
+- Requires Fabric API 0.83.0+, NeoForge 20.4 or Forge 47.1–47.x, and Java 17.
 - NeoForge 20.4 reads `META-INF/mods.toml` (not `neoforge.mods.toml`), has no `@Mod(dist = ...)` and registers its config screen through `ConfigScreenHandler`; the client wiring is therefore a separate class called only when running on the client.
-- Restructured into `common`/`fabric`/`neoforge` Gradle subprojects; shared logic lives in `common`, each platform keeps only its own entrypoint and event/mixin glue.
+- The `forge/` subproject uses ModDevGradle Legacy (`net.neoforged.moddev.legacyforge`) and reobfuscates its jar to SRG; Forge needs a `pack.mcmeta` in the mod or the loader warns about a missing `ResourcePackInfo`.
+- The config screen now draws its own background outside a world: `Screen#render` only does so from 1.20.2 on, so on 1.20 and 1.20.1 the previous screen used to show through.
+- Restructured into `common`/`fabric`/`neoforge`/`forge` Gradle subprojects; shared logic lives in `common`, each platform keeps only its own entrypoint and event/mixin glue.
 
 ## [1.6+backport.1.20.6-1.21.10] - 2026-09-25
 
