@@ -1,3 +1,7 @@
+plugins {
+    id 'me.modmuss50.mod-publish-plugin' version '2.2.1'
+}
+
 // Root project has no source of its own — "common" is a plain source
 // directory that each platform subproject (fabric/, neoforge/) adds to its
 // own sourceSet and compiles against its own Minecraft dependency.
@@ -58,5 +62,71 @@ subprojects {
             // The repositories here will be used for publishing your artifact, not for
             // retrieving dependencies.
         }
+    }
+}
+
+// Release publishing lives in the root project so every loader shares one
+// release note, version and set of project IDs.
+def releaseNotesFor = { String v ->
+    // Player-facing notes win; CHANGELOG.md is developer-facing and only the fallback.
+    def playerNotes = file(".github/release-notes/${v}.md")
+    if (playerNotes.exists()) return playerNotes.text.trim()
+    def m = file('CHANGELOG.md').text =~ /(?ms)^## \[${java.util.regex.Pattern.quote(v)}\][^\n]*\n(.*?)(?=^## \[|\z)/
+    // Fail instead of publishing an empty release note.
+    if (!m.find()) throw new GradleException("No release notes: add .github/release-notes/${v}.md or a '## [${v}]' section to CHANGELOG.md")
+    m.group(1).trim()
+}
+
+publishMods {
+    // Lazy: a plain `./gradlew build` must not need release notes.
+    changelog = providers.provider { releaseNotesFor(mod_version) }
+    version = mod_version
+    type = STABLE
+
+    def mrOptions = modrinthOptions {
+        projectId = providers.gradleProperty('modrinth_project_id')
+        accessToken = providers.environmentVariable('MODRINTH_TOKEN')
+        minecraftVersions.add(minecraft_version)
+        // Without a token, still exercise the whole task graph and write the
+        // assets to build/ instead of failing or uploading.
+        dryRun = providers.environmentVariable('MODRINTH_TOKEN').getOrNull() == null
+    }
+    def cfOptions = curseforgeOptions {
+        projectId = providers.gradleProperty('curseforge_project_id')
+        accessToken = providers.environmentVariable('CURSEFORGE_TOKEN')
+        minecraftVersions.add(minecraft_version)
+        client = true   // CurseForge rejects a file with no environment declared
+        server = true
+        dryRun = providers.environmentVariable('CURSEFORGE_TOKEN').getOrNull() == null
+    }
+
+    // One pair of blocks per loader subproject; display names match the ones already on Modrinth.
+    modrinth('modrinthFabric') {
+        from mrOptions
+        displayName = "${mod_display_name} Fabric"
+        file project(':fabric')
+        modLoaders.add('fabric')
+        requires('fabric-api')
+        optional('modmenu')
+    }
+    curseforge('curseforgeFabric') {
+        from cfOptions
+        displayName = "${mod_display_name} Fabric"
+        file project(':fabric')
+        modLoaders.add('fabric')
+        requires('fabric-api')
+        optional('modmenu')
+    }
+    modrinth('modrinthNeoforge') {
+        from mrOptions
+        displayName = "${mod_display_name} NeoForge"
+        file project(':neoforge')
+        modLoaders.add('neoforge')
+    }
+    curseforge('curseforgeNeoforge') {
+        from cfOptions
+        displayName = "${mod_display_name} NeoForge"
+        file project(':neoforge')
+        modLoaders.add('neoforge')
     }
 }
