@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6+backport.1.20-1.20.4] - 2026-09-26
+
+Backport of 1.6-26.3 to Minecraft 1.20–1.20.4 (Fabric) and 1.20.4 (NeoForge). There was no earlier release for this Minecraft line, so this brings every change from 1.0.0 to 1.6.
+
+### New Features
+- **NeoForge support** — the mod now builds for both Fabric and NeoForge from one repository. NeoForge uses the native `BlockEvent.FarmlandTrampleEvent` instead of a mixin.
+- **Empty farmland protection** — a new option prevents trampling of unplanted farmland. Configurable via Mod Menu or `/nocroptrample empty [on|off]`.
+- **Stem block detection** — pumpkin and melon stems, including the grown `AttachedStemBlock`, are recognized as planted crops, so farmland under them is no longer treated as empty.
+- **Modded crops** — farmland below a block tagged `minecraft:crops` is recognized as planted even when the block doesn't extend the vanilla crop classes.
+- **Command permissions** — commands that change settings (`player`, `mob`, `empty`, `reload`) require permission level 2 (Gamemaster).
+
+### Bug Fixes
+- **Fixed a corrupted config file crashing mod initialization** — malformed JSON in `nocroptrample.json` is now caught and the mod falls back to default settings.
+- **Fixed config defaults on upgrade** — options missing from a config saved by an older version now default to enabled instead of disabled.
+
+### Technical
+- Built against Minecraft 1.20.4 and tested on Fabric dedicated servers running 1.20, 1.20.1 and 1.20.4 and a NeoForge dedicated server running 1.20.4, and played in game on the Fabric and NeoForge clients for 1.20.4; 1.20.2 and 1.20.3 share the same code, and 1.20 and 1.20.1 were not run on a client.
+- NeoForge 20.2 and 20.3 are not covered: ModDevGradle cannot set up a dev environment for them.
+- Requires Fabric API 0.83.0+ or NeoForge 20.4, and Java 17.
+- NeoForge 20.4 reads `META-INF/mods.toml` (not `neoforge.mods.toml`), has no `@Mod(dist = ...)` and registers its config screen through `ConfigScreenHandler`; the client wiring is therefore a separate class called only when running on the client.
+- Restructured into `common`/`fabric`/`neoforge` Gradle subprojects; shared logic lives in `common`, each platform keeps only its own entrypoint and event/mixin glue.
+
 ## [1.6+backport.1.20.6-1.21.10] - 2026-09-25
 
 Backport of 1.6-26.3 to Minecraft 1.20.6–1.21.10. The previous release for the 1.21 line was 1.0.0, so this brings every change from 1.2.0 to 1.6; 1.20.6 had no earlier release.

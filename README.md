@@ -5,7 +5,7 @@ A lightweight, server-side mod for Fabric and NeoForge that prevents farmland fr
 [![Platform: Fabric](https://img.shields.io/badge/Platform-Fabric-blue?style=flat-square)](#)
 [![Platform: NeoForge](https://img.shields.io/badge/Platform-NeoForge-orange?style=flat-square)](#)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
-[![Minecraft: 1.20.6–1.21.10](https://img.shields.io/badge/Minecraft-1.20.6--1.21.10-darkgreen?style=flat-square)](#)
+[![Minecraft: 1.20–1.20.4](https://img.shields.io/badge/Minecraft-1.20--1.20.4-darkgreen?style=flat-square)](#)
 
 [Demo video](https://youtu.be/ypxASh8R1tI)
 

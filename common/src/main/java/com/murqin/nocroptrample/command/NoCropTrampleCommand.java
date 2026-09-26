@@ -224,15 +224,15 @@ public class NoCropTrampleCommand {
                 String label;
 
                 switch (stateName) {
-                    case StateName.EMPTY -> {
+                    case EMPTY -> {
                         ModConfig.setPreventEmptyTrampling(newState);
                         label = LABEL_EMPTY;
                     }
-                    case StateName.PLAYER -> {
+                    case PLAYER -> {
                         ModConfig.setPreventPlayerTrampling(newState);
                         label = LABEL_PLAYER;
                     }
-                    case StateName.MOB -> {
+                    case MOB -> {
                         ModConfig.setPreventMobTrampling(newState);
                         label = LABEL_MOB;
                     }
