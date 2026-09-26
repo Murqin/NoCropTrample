@@ -95,7 +95,9 @@ publishMods {
         projectId = providers.gradleProperty('curseforge_project_id')
         accessToken = providers.environmentVariable('CURSEFORGE_TOKEN')
         minecraftVersions.add(minecraft_version)
-        client = true   // CurseForge rejects a file with no environment declared
+        // CurseForge rejects a file with no environment declared. The mod does its work on the
+        // server; a client install only adds the config screen, so the files are marked server-only.
+        client = false
         server = true
         dryRun = providers.environmentVariable('CURSEFORGE_TOKEN').getOrNull() == null
     }
