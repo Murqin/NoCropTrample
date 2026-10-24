@@ -1,5 +1,6 @@
 # No Crop Trample
 
+> [!CAUTION]
 > Developed with the help of AI coding agents. Bug reports and suggestions are welcome in [Issues](https://github.com/Murqin/NoCropTrample/issues).
 
 A lightweight, server-side mod for Fabric and NeoForge that prevents farmland from being trampled by players or mobs.
