@@ -18,6 +18,9 @@
         "main": [
             "com.murqin.nocroptrample.fabric.NoCropTrampleFabric"
         ],
+        "client": [
+            "com.murqin.nocroptrample.fabric.NoCropTrampleFabricClient"
+        ],
         "modmenu": [
             "com.murqin.nocroptrample.fabric.ModMenuIntegration"
         ]

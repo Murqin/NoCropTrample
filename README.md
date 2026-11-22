@@ -24,11 +24,19 @@ Empty farmland protection only affects unplanted farmland; planted farmland foll
 
 ## Features
 
-- Stops farmland from reverting to dirt when a player or mob lands on it.
-- Player and mob trampling can be toggled independently, via chat commands or the config file.
-- Optional protection for empty (unplanted) farmland.
-- No ticking or entity scanning on either platform (a Fabric Mixin / a native NeoForge event), negligible overhead.
-- Works server-side only; client install is optional and only adds a config screen (via ModMenu on Fabric, or NeoForge's built-in mod config screen).
+- Stops farmland from reverting to dirt when a player or mob lands on it (including player-ridden mounts following player rules).
+- Player, mob, and empty (unplanted) farmland trampling can be toggled independently via chat commands or the config file.
+- **Optional survival balance options:**
+  - **Feather Falling requirement** (`minFeatherFallingLevel`, `0–4`) — optionally require boots with Feather Falling for player protection.
+  - **Max safe fall distance** (`maxSafeFallDistance`, in blocks; `0` = unlimited) — allow high falls to still trample farmland while protecting normal jumps.
+- **Datapack tag support:**
+  - `#nocroptrample:protected_crops` (includes `minecraft:torchflower` by default) for blocks that should count as planted crops.
+  - `#nocroptrample:trample_exempt_entities` for entity types that never trample farmland.
+  - `#nocroptrample:always_trample_entities` for entity types that always trample farmland.
+- **No ticking or entity scanning** on either platform (a Fabric Mixin / a native NeoForge event), negligible overhead.
+- **Works server-side only;** client install is completely optional.
+  - On singleplayer/local worlds, the config screen (via ModMenu on Fabric, or NeoForge's built-in mod config screen) lets you edit settings locally and supports 10 languages.
+  - On multiplayer servers, modded clients optionally receive a read-only view of the server's live settings (or a clear notice if the server doesn't use the mod).
 
 ## Installation
 
@@ -38,13 +46,16 @@ Empty farmland protection only affects unplanted farmland; planted farmland foll
 
 ## Commands
 
-Requires operator permission level 2.
+Viewing status works for everyone; changing settings requires operator permission level 2 (OP status view includes clickable controls).
 
-- `/nocroptrample status` — show current settings.
-- `/nocroptrample empty <on|off>` — toggle protection for empty farmland.
-- `/nocroptrample player <on|off>` — toggle player trampling protection.
-- `/nocroptrample mob <on|off>` — toggle mob trampling protection.
+- `/nocroptrample` or `/nocroptrample status` — show current settings (clickable toggles/steps for OPs).
+- `/nocroptrample empty [on|off]` — view or toggle protection for empty farmland.
+- `/nocroptrample player [on|off]` — view or toggle player trampling protection.
+- `/nocroptrample mob [on|off]` — view or toggle mob trampling protection.
+- `/nocroptrample featherfalling [0-4]` — view or set minimum Feather Falling level (`0` = disabled).
+- `/nocroptrample falldistance [blocks]` — view or set max protected fall distance (`0` = unlimited).
 - `/nocroptrample reload` — reload the config file from disk.
+- `/nocroptrample reset` — reset all settings to defaults.
 
 ## Configuration
 
@@ -54,7 +65,9 @@ Stored at `config/nocroptrample.json`:
 {
   "preventEmptyTrampling": true,
   "preventPlayerTrampling": true,
-  "preventMobTrampling": true
+  "preventMobTrampling": true,
+  "minFeatherFallingLevel": 0,
+  "maxSafeFallDistance": 0.0
 }
 ```
 

@@ -31,5 +31,9 @@ public final class NoCropTrample {
         LOGGER.info("Empty trampling prevention: {}", ModConfig.isPreventEmptyTrampling() ? "ON" : "OFF");
         LOGGER.info("Player trampling prevention: {}", ModConfig.isPreventPlayerTrampling() ? "ON" : "OFF");
         LOGGER.info("Mob trampling prevention: {}", ModConfig.isPreventMobTrampling() ? "ON" : "OFF");
+        LOGGER.info("Min Feather Falling level: {}", ModConfig.getMinFeatherFallingLevel());
+        LOGGER.info("Max safe fall distance: {}", ModConfig.getMaxSafeFallDistance() > 0.0
+                ? ModConfig.getMaxSafeFallDistance()
+                : "Unlimited");
     }
 }
