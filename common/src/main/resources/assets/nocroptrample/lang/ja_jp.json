@@ -17,8 +17,20 @@
   "screen.nocroptrample.option.fall_distance.blocks": "%s ブロック",
   "screen.nocroptrample.option.fall_distance.tooltip": "この距離より高い場所からの落下では耕地が踏み荒らされます。",
   "screen.nocroptrample.button.reset": "デフォルトに戻す",
+  "screen.nocroptrample.local.defaults_hint": "新規ワールドのデフォルト設定（稼働中のワールドはゲームルールを使用します）。",
+  "screen.nocroptrample.local.world_hint": "このワールドのゲームルールを編集中。",
   "screen.nocroptrample.remote.readonly": "ここではサーバー設定を変更できません。現在のサーバー設定を表示中:",
-  "screen.nocroptrample.remote.command_hint": "サーバー管理者は /nocroptrample で設定を変更できます。",
+  "screen.nocroptrample.remote.command_hint": "サーバー管理者は /nocroptrample または /gamerule で設定を変更できます。",
   "screen.nocroptrample.remote.legacy": "ここではサーバー設定を変更できません。このサーバーは旧バージョンの No Crop Trample を使用しています — チャットで /nocroptrample status を実行してください。",
-  "screen.nocroptrample.remote.not_installed": "このサーバーには No Crop Trample が導入されていません。"
+  "screen.nocroptrample.remote.not_installed": "このサーバーには No Crop Trample が導入されていません。",
+  "gamerule.nocroptrample.prevent_empty_trampling": "空の耕地の踏み荒らしを防止",
+  "gamerule.nocroptrample.prevent_empty_trampling.description": "作物が植えられていない耕地が土に戻るのを防ぎます。",
+  "gamerule.nocroptrample.prevent_player_trampling": "プレイヤーによる作物の踏み荒らしを防止",
+  "gamerule.nocroptrample.prevent_player_trampling.description": "プレイヤーおよび騎乗モブによる作物の踏み荒らしを防ぎます。",
+  "gamerule.nocroptrample.prevent_mob_trampling": "モブによる作物の踏み荒らしを防止",
+  "gamerule.nocroptrample.prevent_mob_trampling.description": "モブによる作物が植えられた耕地の踏み荒らしを防ぎます。",
+  "gamerule.nocroptrample.min_feather_falling_level": "耕地保護の最小落下耐性",
+  "gamerule.nocroptrample.min_feather_falling_level.description": "プレイヤー保護に必要なブーツの最小落下耐性レベル（0 = 無効）。",
+  "gamerule.nocroptrample.max_safe_fall_distance": "耕地保護の最大安全落下距離",
+  "gamerule.nocroptrample.max_safe_fall_distance.description": "踏み荒らされずに落下できる最大ブロック数（0 = 無制限）。"
 }

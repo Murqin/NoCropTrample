@@ -17,8 +17,20 @@
   "screen.nocroptrample.option.fall_distance.blocks": "%s бл.",
   "screen.nocroptrample.option.fall_distance.tooltip": "Падения с большей высоты всё равно вытопчут пашню.",
   "screen.nocroptrample.button.reset": "Сбросить",
+  "screen.nocroptrample.local.defaults_hint": "Настройки по умолчанию для новых миров (активные миры используют игровые правила).",
+  "screen.nocroptrample.local.world_hint": "Редактирование игровых правил этого мира.",
   "screen.nocroptrample.remote.readonly": "Вы не можете менять настройки сервера здесь. Показаны текущие настройки сервера:",
-  "screen.nocroptrample.remote.command_hint": "Операторы сервера могут менять настройки командой /nocroptrample.",
+  "screen.nocroptrample.remote.command_hint": "Операторы могут менять настройки командами /nocroptrample или /gamerule.",
   "screen.nocroptrample.remote.legacy": "Вы не можете менять настройки сервера здесь. На сервере установлена старая версия No Crop Trample — введите /nocroptrample status в чате.",
-  "screen.nocroptrample.remote.not_installed": "На этом сервере не установлен No Crop Trample."
+  "screen.nocroptrample.remote.not_installed": "На этом сервере не установлен No Crop Trample.",
+  "gamerule.nocroptrample.prevent_empty_trampling": "Защита пустой пашни от вытаптывания",
+  "gamerule.nocroptrample.prevent_empty_trampling.description": "Защищает незасаженную пашню от превращения в землю при вытаптывании.",
+  "gamerule.nocroptrample.prevent_player_trampling": "Защита пашни от игроков",
+  "gamerule.nocroptrample.prevent_player_trampling.description": "Запрещает игрокам и управляемым ими ездовым животным вытаптывать посаженную пашню.",
+  "gamerule.nocroptrample.prevent_mob_trampling": "Защита пашни от мобов",
+  "gamerule.nocroptrample.prevent_mob_trampling.description": "Запрещает мобам вытаптывать посаженную пашню.",
+  "gamerule.nocroptrample.min_feather_falling_level": "Мин. Невесомость для защиты пашни",
+  "gamerule.nocroptrample.min_feather_falling_level.description": "Минимальный уровень чар «Невесомость» на ботинках для защиты игрока (0 = выкл.).",
+  "gamerule.nocroptrample.max_safe_fall_distance": "Макс. безопасное падение на пашню",
+  "gamerule.nocroptrample.max_safe_fall_distance.description": "Максимальная высота падения в блоках, при которой пашня остаётся защищённой (0 = без ограничений)."
 }

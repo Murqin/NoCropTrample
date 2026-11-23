@@ -25,6 +25,18 @@ class ResourcesValidationTest {
             "en_us", "tr_tr", "de_de", "es_es", "fr_fr",
             "pt_br", "ru_ru", "zh_cn", "ja_jp", "ko_kr");
 
+    private static final List<String> REQUIRED_GAMERULE_KEYS = List.of(
+            "gamerule.nocroptrample.prevent_empty_trampling",
+            "gamerule.nocroptrample.prevent_empty_trampling.description",
+            "gamerule.nocroptrample.prevent_player_trampling",
+            "gamerule.nocroptrample.prevent_player_trampling.description",
+            "gamerule.nocroptrample.prevent_mob_trampling",
+            "gamerule.nocroptrample.prevent_mob_trampling.description",
+            "gamerule.nocroptrample.min_feather_falling_level",
+            "gamerule.nocroptrample.min_feather_falling_level.description",
+            "gamerule.nocroptrample.max_safe_fall_distance",
+            "gamerule.nocroptrample.max_safe_fall_distance.description");
+
     private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("%s");
 
     @Test
@@ -32,6 +44,9 @@ class ResourcesValidationTest {
         Map<String, Object> english = loadJsonObject("assets/nocroptrample/lang/en_us.json");
         Set<String> expectedKeys = english.keySet();
         assertFalse(expectedKeys.isEmpty(), "Expected at least one translation key");
+        for (String requiredKey : REQUIRED_GAMERULE_KEYS) {
+            assertTrue(expectedKeys.contains(requiredKey), "Missing game rule key in en_us.json: " + requiredKey);
+        }
 
         for (String lang : LANGUAGES) {
             Map<String, Object> localized = loadJsonObject("assets/nocroptrample/lang/" + lang + ".json");

@@ -17,8 +17,20 @@
   "screen.nocroptrample.option.fall_distance.blocks": "%s bloques",
   "screen.nocroptrample.option.fall_distance.tooltip": "Las caídas mayores a esta distancia seguirán pisoteando el cultivo. Ilimitada da protección total.",
   "screen.nocroptrample.button.reset": "Restablecer",
+  "screen.nocroptrample.local.defaults_hint": "Ajustes predeterminados para mundos nuevos (los mundos activos usan reglas de juego).",
+  "screen.nocroptrample.local.world_hint": "Editando las reglas de juego de este mundo.",
   "screen.nocroptrample.remote.readonly": "No puedes cambiar la configuración del servidor aquí. Mostrando configuración actual del servidor:",
-  "screen.nocroptrample.remote.command_hint": "Los operadores del servidor pueden cambiar los ajustes con /nocroptrample.",
+  "screen.nocroptrample.remote.command_hint": "Los operadores pueden cambiar los ajustes con /nocroptrample o /gamerule.",
   "screen.nocroptrample.remote.legacy": "No puedes cambiar la configuración del servidor aquí. Este servidor usa una versión antigua de No Crop Trample — usa /nocroptrample status en el chat.",
-  "screen.nocroptrample.remote.not_installed": "Este servidor no tiene instalado No Crop Trample."
+  "screen.nocroptrample.remote.not_installed": "Este servidor no tiene instalado No Crop Trample.",
+  "gamerule.nocroptrample.prevent_empty_trampling": "Evitar pisoteo de tierra vacía",
+  "gamerule.nocroptrample.prevent_empty_trampling.description": "Evita que la tierra de cultivo sin plantar se convierta en tierra al pisarla.",
+  "gamerule.nocroptrample.prevent_player_trampling": "Evitar pisoteo de cultivos (jugadores)",
+  "gamerule.nocroptrample.prevent_player_trampling.description": "Evita que jugadores y monturas controladas por jugadores pisoteen cultivos.",
+  "gamerule.nocroptrample.prevent_mob_trampling": "Evitar pisoteo de cultivos (mobs)",
+  "gamerule.nocroptrample.prevent_mob_trampling.description": "Evita que los mobs pisoteen tierra de cultivo plantada.",
+  "gamerule.nocroptrample.min_feather_falling_level": "Caída de pluma mín. para cultivos",
+  "gamerule.nocroptrample.min_feather_falling_level.description": "Nivel mínimo de Caída de pluma en botas para proteger al jugador (0 = desactivado).",
+  "gamerule.nocroptrample.max_safe_fall_distance": "Caída segura máx. en cultivos",
+  "gamerule.nocroptrample.max_safe_fall_distance.description": "Altura máxima de caída en bloques protegida contra pisoteo (0 = ilimitada)."
 }

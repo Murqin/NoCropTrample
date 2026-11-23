@@ -17,8 +17,20 @@
   "screen.nocroptrample.option.fall_distance.blocks": "%s blocs",
   "screen.nocroptrample.option.fall_distance.tooltip": "Les chutes au-delà de cette hauteur piétineront toujours les cultures.",
   "screen.nocroptrample.button.reset": "Réinitialiser",
+  "screen.nocroptrample.local.defaults_hint": "Paramètres par défaut des nouveaux mondes (les mondes actifs utilisent les règles du jeu).",
+  "screen.nocroptrample.local.world_hint": "Modification des règles de ce monde.",
   "screen.nocroptrample.remote.readonly": "Vous ne pouvez pas modifier les paramètres du serveur ici. Paramètres actuels du serveur :",
-  "screen.nocroptrample.remote.command_hint": "Les opérateurs peuvent modifier ces paramètres avec /nocroptrample.",
+  "screen.nocroptrample.remote.command_hint": "Les opérateurs peuvent modifier ces paramètres avec /nocroptrample ou /gamerule.",
   "screen.nocroptrample.remote.legacy": "Vous ne pouvez pas modifier les paramètres du serveur ici. Ce serveur utilise une ancienne version de No Crop Trample — tapez /nocroptrample status dans le tchat.",
-  "screen.nocroptrample.remote.not_installed": "No Crop Trample n'est pas installé sur ce serveur."
+  "screen.nocroptrample.remote.not_installed": "No Crop Trample n'est pas installé sur ce serveur.",
+  "gamerule.nocroptrample.prevent_empty_trampling": "Empêcher le piétinement de la terre vide",
+  "gamerule.nocroptrample.prevent_empty_trampling.description": "Empêche la terre labourée sans culture de redevenir de la terre.",
+  "gamerule.nocroptrample.prevent_player_trampling": "Empêcher le piétinement par les joueurs",
+  "gamerule.nocroptrample.prevent_player_trampling.description": "Empêche les joueurs et leurs montures de piétiner les cultures.",
+  "gamerule.nocroptrample.prevent_mob_trampling": "Empêcher le piétinement par les créatures",
+  "gamerule.nocroptrample.prevent_mob_trampling.description": "Empêche les créatures de piétiner les terres labourées plantées.",
+  "gamerule.nocroptrample.min_feather_falling_level": "Chute amortie min. (cultures)",
+  "gamerule.nocroptrample.min_feather_falling_level.description": "Niveau minimum de Chute amortie requis sur les bottes pour protéger le joueur (0 = désactivé).",
+  "gamerule.nocroptrample.max_safe_fall_distance": "Hauteur de chute sûre max. (cultures)",
+  "gamerule.nocroptrample.max_safe_fall_distance.description": "Hauteur de chute maximale en blocs restant protégée (0 = illimitée)."
 }

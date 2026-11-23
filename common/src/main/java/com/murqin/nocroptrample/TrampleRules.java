@@ -3,12 +3,16 @@ package com.murqin.nocroptrample;
 import com.murqin.nocroptrample.config.ConfigSnapshot;
 import com.murqin.nocroptrample.config.ModConfig;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.LevelReader;
@@ -17,6 +21,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.StemBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.gamerules.GameRules;
+
+import java.util.Optional;
 
 /**
  * Trampling decision shared by the Fabric mixin and the NeoForge event
@@ -34,39 +41,77 @@ public final class TrampleRules {
     }
 
     /**
-     * @param entity       the entity causing the trample (must not be null)
+     * @param entity       the entity causing the trample (may be null)
      * @param level        the level containing the farmland
      * @param pos          the farmland's position
      * @param fallDistance the entity's fall distance in blocks
      * @return true if the farmland-to-dirt conversion should be cancelled
      */
     public static boolean shouldPreventTrampling(Entity entity, LevelReader level, BlockPos pos, double fallDistance) {
-        ConfigSnapshot config = ModConfig.snapshot();
+        if (entity == null || level == null || pos == null) {
+            return false;
+        }
+
         Player controllingPlayer = (entity instanceof Player p)
                 ? p
                 : (entity.getControllingPassenger() instanceof Player p ? p : null);
         boolean isPlayer = controllingPlayer != null;
 
-        boolean alwaysTrample = isEntityInTag(entity, ModTags.ALWAYS_TRAMPLE_ENTITIES)
-                || (controllingPlayer != null && controllingPlayer != entity
-                        && isEntityInTag(controllingPlayer, ModTags.ALWAYS_TRAMPLE_ENTITIES));
-        boolean trampleExempt = isEntityInTag(entity, ModTags.TRAMPLE_EXEMPT_ENTITIES)
-                || (controllingPlayer != null && controllingPlayer != entity
-                        && isEntityInTag(controllingPlayer, ModTags.TRAMPLE_EXEMPT_ENTITIES));
+        if (isEntityOrRiderInTag(entity, controllingPlayer, ModTags.ALWAYS_TRAMPLE_ENTITIES)) {
+            return false;
+        }
+        if (isEntityOrRiderInTag(entity, controllingPlayer, ModTags.TRAMPLE_EXEMPT_ENTITIES)) {
+            return true;
+        }
 
-        int featherFallingLevel = (isPlayer && config.minFeatherFallingLevel() > 0)
-                ? getFeatherFallingLevel(controllingPlayer, level)
-                : 0;
+        if (level instanceof ServerLevel serverLevel && ModGameRules.isRegistered()) {
+            GameRules rules = serverLevel.getGameRules();
+            int maxSafeFall = rules.get(ModGameRules.maxSafeFallDistance);
+            if (maxSafeFall > 0 && fallDistance > maxSafeFall + FARMLAND_DEPTH_TOLERANCE) {
+                return false;
+            }
 
-        boolean isEmpty = !isCropAbove(level, pos);
-        return shouldCancel(
-                isEmpty,
-                isPlayer,
-                alwaysTrample,
-                trampleExempt,
-                fallDistance,
-                featherFallingLevel,
-                config);
+            boolean preventEmpty = rules.get(ModGameRules.preventEmptyTrampling);
+            boolean targetRule = isPlayer
+                    ? rules.get(ModGameRules.preventPlayerTrampling)
+                    : rules.get(ModGameRules.preventMobTrampling);
+
+            // Skip pos.above() allocation and chunk lookup when empty and target agree
+            boolean baseAllowed = (preventEmpty == targetRule)
+                    ? targetRule
+                    : (isCropAbove(level, pos) ? targetRule : preventEmpty);
+            if (!baseAllowed) {
+                return false;
+            }
+
+            if (isPlayer) {
+                int minFF = rules.get(ModGameRules.minFeatherFallingLevel);
+                if (minFF > 0) {
+                    return getFeatherFallingLevel(controllingPlayer, level) >= minFF;
+                }
+            }
+            return true;
+        }
+
+        ConfigSnapshot config = ModConfig.snapshot();
+        if (config.maxSafeFallDistance() > 0
+                && fallDistance > config.maxSafeFallDistance() + FARMLAND_DEPTH_TOLERANCE) {
+            return false;
+        }
+
+        boolean preventEmpty = config.preventEmptyTrampling();
+        boolean targetRule = isPlayer ? config.preventPlayerTrampling() : config.preventMobTrampling();
+        boolean baseAllowed = (preventEmpty == targetRule)
+                ? targetRule
+                : (isCropAbove(level, pos) ? targetRule : preventEmpty);
+        if (!baseAllowed) {
+            return false;
+        }
+
+        if (isPlayer && config.minFeatherFallingLevel() > 0) {
+            return getFeatherFallingLevel(controllingPlayer, level) >= config.minFeatherFallingLevel();
+        }
+        return true;
     }
 
     /**
@@ -87,7 +132,7 @@ public final class TrampleRules {
         if (trampleExempt) {
             return true;
         }
-        if (config.maxSafeFallDistance() > 0.0
+        if (config.maxSafeFallDistance() > 0
                 && fallDistance > config.maxSafeFallDistance() + FARMLAND_DEPTH_TOLERANCE) {
             return false;
         }
@@ -105,20 +150,27 @@ public final class TrampleRules {
         return true;
     }
 
-    private static boolean isEntityInTag(Entity entity, TagKey<EntityType<?>> tag) {
-        return entity.typeHolder().is(tag);
+    private static boolean isEntityOrRiderInTag(Entity entity, Player controllingPlayer, TagKey<EntityType<?>> tag) {
+        if (entity.typeHolder().is(tag)) {
+            return true;
+        }
+        return controllingPlayer != null && controllingPlayer != entity && controllingPlayer.typeHolder().is(tag);
     }
 
     private static int getFeatherFallingLevel(Player player, LevelReader level) {
-        return level.registryAccess()
-                .lookup(Registries.ENCHANTMENT)
-                .flatMap(reg -> reg.get(Enchantments.FEATHER_FALLING))
-                .map(holder -> EnchantmentHelper.getEnchantmentLevel(holder, player))
-                .orElse(0);
+        Optional<Registry<Enchantment>> lookup = level.registryAccess().lookup(Registries.ENCHANTMENT);
+        if (lookup.isEmpty()) {
+            return 0;
+        }
+        Optional<Holder.Reference<Enchantment>> holder = lookup.get().get(Enchantments.FEATHER_FALLING);
+        return holder.isPresent() ? EnchantmentHelper.getEnchantmentLevel(holder.get(), player) : 0;
     }
 
     private static boolean isCropAbove(LevelReader level, BlockPos pos) {
         BlockState aboveState = level.getBlockState(pos.above());
+        if (aboveState.isAir()) {
+            return false;
+        }
         Block aboveBlock = aboveState.getBlock();
         return aboveBlock instanceof CropBlock
                 || aboveBlock instanceof StemBlock

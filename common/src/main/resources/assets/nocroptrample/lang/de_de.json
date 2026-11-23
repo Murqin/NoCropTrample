@@ -17,8 +17,20 @@
   "screen.nocroptrample.option.fall_distance.blocks": "%s Blöcke",
   "screen.nocroptrample.option.fall_distance.tooltip": "Stürze aus größerer Höhe zertrampeln weiterhin Ackerland. Unbegrenzt bietet vollen Schutz.",
   "screen.nocroptrample.button.reset": "Zurücksetzen",
+  "screen.nocroptrample.local.defaults_hint": "Standardeinstellungen für neue Welten (aktive Welten nutzen Spielregeln).",
+  "screen.nocroptrample.local.world_hint": "Spielregeln dieser Welt werden bearbeitet.",
   "screen.nocroptrample.remote.readonly": "Du kannst die Servereinstellungen hier nicht ändern. Aktuelle Servereinstellungen:",
-  "screen.nocroptrample.remote.command_hint": "Server-Operatoren können die Einstellungen mit /nocroptrample ändern.",
+  "screen.nocroptrample.remote.command_hint": "Server-Operatoren können Einstellungen mit /nocroptrample oder /gamerule ändern.",
   "screen.nocroptrample.remote.legacy": "Du kannst die Servereinstellungen hier nicht ändern. Auf diesem Server läuft eine ältere Version von No Crop Trample — nutze /nocroptrample status im Chat.",
-  "screen.nocroptrample.remote.not_installed": "Auf diesem Server ist No Crop Trample nicht installiert."
+  "screen.nocroptrample.remote.not_installed": "Auf diesem Server ist No Crop Trample nicht installiert.",
+  "gamerule.nocroptrample.prevent_empty_trampling": "Zertrampeln von leerem Ackerland verhindern",
+  "gamerule.nocroptrample.prevent_empty_trampling.description": "Verhindert, dass unbepflanztes Ackerland zu Erde zertrampelt wird.",
+  "gamerule.nocroptrample.prevent_player_trampling": "Zertrampeln durch Spieler verhindern",
+  "gamerule.nocroptrample.prevent_player_trampling.description": "Verhindert, dass Spieler und Reittiere bepflanztes Ackerland zertrampeln.",
+  "gamerule.nocroptrample.prevent_mob_trampling": "Zertrampeln durch Mobs verhindern",
+  "gamerule.nocroptrample.prevent_mob_trampling.description": "Verhindert, dass Mobs bepflanztes Ackerland zertrampeln.",
+  "gamerule.nocroptrample.min_feather_falling_level": "Min. Federfall für Ackerschutz",
+  "gamerule.nocroptrample.min_feather_falling_level.description": "Erforderliche Federfall-Stufe auf Stiefeln für Spielerschutz (0 = aus).",
+  "gamerule.nocroptrample.max_safe_fall_distance": "Max. sichere Fallhöhe für Ackerland",
+  "gamerule.nocroptrample.max_safe_fall_distance.description": "Maximale geschützte Fallhöhe in Blöcken (0 = unbegrenzt)."
 }

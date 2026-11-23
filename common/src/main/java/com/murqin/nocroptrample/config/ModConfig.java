@@ -4,35 +4,39 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializer;
 import com.murqin.nocroptrample.NoCropTrample;
 
 import java.io.IOException;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.function.Consumer;
 
 /**
- * Configuration manager for the NoCropTrample mod.
+ * Configuration manager for NoCropTrample default settings ({@code config/nocroptrample.json}).
  * <p>
- * Handles loading, saving, and accessing mod configuration values.
- * Config file is stored as JSON in the platform's config directory.
+ * Active worlds store their live settings per-world in Minecraft's GameRules;
+ * this config provides global defaults for new worlds and {@code /nocroptrample reload}.
  * </p>
  */
 public class ModConfig {
     private static final Gson GSON = new GsonBuilder()
             .setPrettyPrinting()
             .registerTypeAdapter(ConfigData.class, (InstanceCreator<ConfigData>) type -> new ConfigData())
+            .registerTypeAdapter(Double.class, (JsonSerializer<Double>) (src, typeOfSrc, context) ->
+                    src != null && Double.isFinite(src) && src == Math.rint(src)
+                            ? new JsonPrimitive(src.longValue())
+                            : new JsonPrimitive(src))
             .create();
 
-    private static Path configPath;
-    private static volatile Consumer<ConfigSnapshot> changeListener = snapshot -> {};
+    private static final Object IO_LOCK = new Object();
 
-    // Config values - encapsulated with getters/setters
-    private static boolean preventEmptyTrampling = true;
-    private static boolean preventPlayerTrampling = true;
-    private static boolean preventMobTrampling = true;
-    private static int minFeatherFallingLevel = 0;
-    private static double maxSafeFallDistance = 0.0;
+    private static volatile Path configPath;
+    private static volatile Consumer<ConfigSnapshot> changeListener = snapshot -> {};
+    private static volatile ConfigSnapshot current = ConfigSnapshot.DEFAULTS;
 
     /**
      * Sets the directory the config file lives in. Must be called once by
@@ -41,12 +45,15 @@ public class ModConfig {
      * @param configDir the platform's config directory
      */
     public static void init(Path configDir) {
-        configPath = configDir.resolve(NoCropTrample.MOD_ID + ".json");
+        configPath = configDir != null
+                ? configDir.toAbsolutePath().resolve(NoCropTrample.MOD_ID + ".json")
+                : null;
     }
 
     /**
      * Registers a listener invoked whenever configuration changes via
-     * {@link #load()}, {@link #save()}, or {@link #reset()}.
+     * {@link #load()}, {@link #reload()}, {@link #save()}, {@link #applyAndSave(ConfigSnapshot)},
+     * or {@link #reset()}.
      *
      * @param listener consumer receiving the updated {@link ConfigSnapshot}, or {@code null} to clear
      */
@@ -55,187 +62,244 @@ public class ModConfig {
     }
 
     /**
-     * Returns an immutable snapshot of all current configuration values.
+     * Returns an immutable snapshot of all current default configuration values.
      */
     public static ConfigSnapshot snapshot() {
-        return new ConfigSnapshot(
-                preventEmptyTrampling,
-                preventPlayerTrampling,
-                preventMobTrampling,
-                minFeatherFallingLevel,
-                maxSafeFallDistance);
+        return current;
     }
 
-    /**
-     * Gets whether empty trampling prevention is enabled.
-     *
-     * @return true if empty farmland cannot be trampled, false otherwise
-     */
     public static boolean isPreventEmptyTrampling() {
-        return preventEmptyTrampling;
+        return current.preventEmptyTrampling();
     }
 
-    /**
-     * Sets whether empty trampling prevention is enabled.
-     * Automatically saves the configuration after updating.
-     *
-     * @param value true to prevent trampling of empty farmland, false otherwise
-     */
     public static void setPreventEmptyTrampling(boolean value) {
-        preventEmptyTrampling = value;
-        save();
+        synchronized (IO_LOCK) {
+            ConfigSnapshot c = current;
+            applyAndSave(new ConfigSnapshot(
+                    value,
+                    c.preventPlayerTrampling(),
+                    c.preventMobTrampling(),
+                    c.minFeatherFallingLevel(),
+                    c.maxSafeFallDistance()));
+        }
     }
 
-    /**
-     * Gets whether player trampling prevention is enabled.
-     *
-     * @return true if players cannot trample farmland, false otherwise
-     */
     public static boolean isPreventPlayerTrampling() {
-        return preventPlayerTrampling;
+        return current.preventPlayerTrampling();
     }
 
-    /**
-     * Sets whether player trampling prevention is enabled.
-     * Automatically saves the configuration after updating.
-     *
-     * @param value true to prevent players from trampling farmland, false otherwise
-     */
     public static void setPreventPlayerTrampling(boolean value) {
-        preventPlayerTrampling = value;
-        save();
+        synchronized (IO_LOCK) {
+            ConfigSnapshot c = current;
+            applyAndSave(new ConfigSnapshot(
+                    c.preventEmptyTrampling(),
+                    value,
+                    c.preventMobTrampling(),
+                    c.minFeatherFallingLevel(),
+                    c.maxSafeFallDistance()));
+        }
     }
 
-    /**
-     * Gets whether mob trampling prevention is enabled.
-     *
-     * @return true if mobs cannot trample farmland, false otherwise
-     */
     public static boolean isPreventMobTrampling() {
-        return preventMobTrampling;
+        return current.preventMobTrampling();
     }
 
-    /**
-     * Sets whether mob trampling prevention is enabled.
-     * Automatically saves the configuration after updating.
-     *
-     * @param value true to prevent mobs from trampling farmland, false otherwise
-     */
     public static void setPreventMobTrampling(boolean value) {
-        preventMobTrampling = value;
-        save();
+        synchronized (IO_LOCK) {
+            ConfigSnapshot c = current;
+            applyAndSave(new ConfigSnapshot(
+                    c.preventEmptyTrampling(),
+                    c.preventPlayerTrampling(),
+                    value,
+                    c.minFeatherFallingLevel(),
+                    c.maxSafeFallDistance()));
+        }
     }
 
-    /**
-     * Gets the minimum Feather Falling enchantment level required for players
-     * to avoid trampling farmland ({@code 0} means no enchantment required).
-     */
     public static int getMinFeatherFallingLevel() {
-        return minFeatherFallingLevel;
+        return current.minFeatherFallingLevel();
     }
 
-    /**
-     * Sets the minimum Feather Falling level (clamped to {@code 0..4}) and saves.
-     */
     public static void setMinFeatherFallingLevel(int level) {
-        minFeatherFallingLevel = ConfigSnapshot.clampFeatherFallingLevel(level);
-        save();
+        synchronized (IO_LOCK) {
+            ConfigSnapshot c = current;
+            applyAndSave(new ConfigSnapshot(
+                    c.preventEmptyTrampling(),
+                    c.preventPlayerTrampling(),
+                    c.preventMobTrampling(),
+                    ConfigSnapshot.clampFeatherFallingLevel(level),
+                    c.maxSafeFallDistance()));
+        }
+    }
+
+    public static int getMaxSafeFallDistance() {
+        return current.maxSafeFallDistance();
+    }
+
+    public static void setMaxSafeFallDistance(int distance) {
+        synchronized (IO_LOCK) {
+            ConfigSnapshot c = current;
+            applyAndSave(new ConfigSnapshot(
+                    c.preventEmptyTrampling(),
+                    c.preventPlayerTrampling(),
+                    c.preventMobTrampling(),
+                    c.minFeatherFallingLevel(),
+                    ConfigSnapshot.clampFallDistance(distance)));
+        }
     }
 
     /**
-     * Gets the maximum fall distance in blocks that remains protected
-     * ({@code 0.0} means unlimited protection).
+     * Applies a full snapshot and atomically writes it to disk only if it differs from current.
+     *
+     * @param updated the new configuration snapshot
      */
-    public static double getMaxSafeFallDistance() {
-        return maxSafeFallDistance;
+    public static void applyAndSave(ConfigSnapshot updated) {
+        if (updated == null) {
+            return;
+        }
+        synchronized (IO_LOCK) {
+            if (updated.equals(current)) {
+                return;
+            }
+            current = updated;
+            saveLocked(updated);
+        }
     }
 
     /**
-     * Sets the maximum protected fall distance in blocks ({@code <= 0} or non-finite becomes {@code 0.0})
-     * and saves.
-     */
-    public static void setMaxSafeFallDistance(double distance) {
-        maxSafeFallDistance = ConfigSnapshot.sanitizeFallDistance(distance);
-        save();
-    }
-
-    /**
-     * Resets all settings to {@link ConfigSnapshot#DEFAULTS} and saves to disk.
+     * Resets all default settings to {@link ConfigSnapshot#DEFAULTS} and saves to disk if changed.
      */
     public static void reset() {
-        applySnapshot(ConfigSnapshot.DEFAULTS);
-        save();
+        applyAndSave(ConfigSnapshot.DEFAULTS);
     }
 
     /**
-     * Loads configuration from disk.
-     * If the config file doesn't exist, creates a new one with default values.
+     * Startup configuration load. Creates defaults if missing; falls back to
+     * {@link ConfigSnapshot#DEFAULTS} if malformed or unreadable.
+     *
+     * @return {@code true} if config was loaded or created cleanly, {@code false} on failure fallback
      */
-    public static void load() {
-        if (Files.exists(configPath)) {
+    public static boolean load() {
+        return loadInternal(false);
+    }
+
+    /**
+     * Runtime configuration reload (e.g., {@code /nocroptrample reload}).
+     * Preserves the active in-memory defaults if the file on disk is malformed or unreadable.
+     *
+     * @return {@code true} if reloaded cleanly, {@code false} if failed and previous values were kept
+     */
+    public static boolean reload() {
+        return loadInternal(true);
+    }
+
+    private static boolean loadInternal(boolean preserveOnFailure) {
+        synchronized (IO_LOCK) {
+            Path path = configPath;
+            if (path == null) {
+                NoCropTrample.LOGGER.warn("Config path not initialized; skipping load");
+                return false;
+            }
+            if (!Files.exists(path)) {
+                current = ConfigSnapshot.DEFAULTS;
+                saveLocked(current);
+                return true;
+            }
+
             ConfigSnapshot loaded;
             try {
-                String json = Files.readString(configPath);
+                String json = Files.readString(path);
                 ConfigData data = GSON.fromJson(json, ConfigData.class);
-                loaded = (data != null)
-                        ? new ConfigSnapshot(
-                                data.preventEmptyTrampling,
-                                data.preventPlayerTrampling,
-                                data.preventMobTrampling,
-                                data.minFeatherFallingLevel,
-                                data.maxSafeFallDistance)
-                        : ConfigSnapshot.DEFAULTS;
-                NoCropTrample.LOGGER.info("Config loaded from {}", configPath);
-            } catch (IOException | JsonParseException e) {
-                NoCropTrample.LOGGER.error("Failed to load config from {}, falling back to defaults", configPath, e);
-                loaded = ConfigSnapshot.DEFAULTS;
+                if (data == null) {
+                    NoCropTrample.LOGGER.warn("Config file {} is empty or null", path);
+                    if (preserveOnFailure) {
+                        return false;
+                    }
+                    current = ConfigSnapshot.DEFAULTS;
+                    changeListener.accept(current);
+                    return false;
+                }
+                int fallDistance = data.maxSafeFallDistance != null
+                        ? ConfigSnapshot.sanitizeFallDistance(data.maxSafeFallDistance)
+                        : 0;
+                loaded = new ConfigSnapshot(
+                        data.preventEmptyTrampling,
+                        data.preventPlayerTrampling,
+                        data.preventMobTrampling,
+                        data.minFeatherFallingLevel,
+                        fallDistance);
+                NoCropTrample.LOGGER.info("Config loaded from {}", path);
+            } catch (IOException | JsonParseException | NumberFormatException e) {
+                NoCropTrample.LOGGER.error("Failed to load config from {}", path, e);
+                if (preserveOnFailure) {
+                    return false;
+                }
+                current = ConfigSnapshot.DEFAULTS;
+                changeListener.accept(current);
+                return false;
             }
-            applySnapshot(loaded);
+            current = loaded;
             changeListener.accept(loaded);
-        } else {
-            applySnapshot(ConfigSnapshot.DEFAULTS);
-            save(); // Create default config
+            return true;
         }
     }
 
     /**
-     * Saves the current configuration to disk.
+     * Saves the current configuration atomically to disk.
      */
     public static void save() {
-        ConfigSnapshot current = snapshot();
-        try {
-            ConfigData data = new ConfigData();
-            data.preventEmptyTrampling = current.preventEmptyTrampling();
-            data.preventPlayerTrampling = current.preventPlayerTrampling();
-            data.preventMobTrampling = current.preventMobTrampling();
-            data.minFeatherFallingLevel = current.minFeatherFallingLevel();
-            data.maxSafeFallDistance = current.maxSafeFallDistance();
+        synchronized (IO_LOCK) {
+            saveLocked(current);
+        }
+    }
 
-            Files.createDirectories(configPath.getParent());
-            Files.writeString(configPath, GSON.toJson(data));
-            NoCropTrample.LOGGER.info("Config saved to {}", configPath);
+    private static void saveLocked(ConfigSnapshot snapshot) {
+        Path path = configPath;
+        if (path == null) {
+            NoCropTrample.LOGGER.warn("Config path not initialized; skipping save");
+            return;
+        }
+
+        Path tmp = null;
+        try {
+            Path parent = path.getParent();
+            if (parent != null) {
+                Files.createDirectories(parent);
+            }
+            ConfigData data = new ConfigData();
+            data.preventEmptyTrampling = snapshot.preventEmptyTrampling();
+            data.preventPlayerTrampling = snapshot.preventPlayerTrampling();
+            data.preventMobTrampling = snapshot.preventMobTrampling();
+            data.minFeatherFallingLevel = snapshot.minFeatherFallingLevel();
+            data.maxSafeFallDistance = (double) snapshot.maxSafeFallDistance();
+
+            Path tempDir = parent != null ? parent : Path.of(".");
+            tmp = Files.createTempFile(tempDir, NoCropTrample.MOD_ID + "-", ".tmp");
+            Files.writeString(tmp, GSON.toJson(data));
+            try {
+                Files.move(tmp, path, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+            } catch (AtomicMoveNotSupportedException ignored) {
+                Files.move(tmp, path, StandardCopyOption.REPLACE_EXISTING);
+            }
+            NoCropTrample.LOGGER.info("Config saved to {}", path);
         } catch (IOException e) {
             NoCropTrample.LOGGER.error("Failed to save config", e);
+        } finally {
+            if (tmp != null) {
+                try {
+                    Files.deleteIfExists(tmp);
+                } catch (IOException ignored) {
+                }
+            }
         }
-        changeListener.accept(current);
+        changeListener.accept(snapshot);
     }
 
-    private static void applySnapshot(ConfigSnapshot snapshot) {
-        preventEmptyTrampling = snapshot.preventEmptyTrampling();
-        preventPlayerTrampling = snapshot.preventPlayerTrampling();
-        preventMobTrampling = snapshot.preventMobTrampling();
-        minFeatherFallingLevel = snapshot.minFeatherFallingLevel();
-        maxSafeFallDistance = snapshot.maxSafeFallDistance();
-    }
-
-    /**
-     * Inner class for JSON serialization/deserialization.
-     */
     private static class ConfigData {
         boolean preventEmptyTrampling = true;
         boolean preventPlayerTrampling = true;
         boolean preventMobTrampling = true;
         int minFeatherFallingLevel = 0;
-        double maxSafeFallDistance = 0.0;
+        Double maxSafeFallDistance = 0.0;
     }
 }

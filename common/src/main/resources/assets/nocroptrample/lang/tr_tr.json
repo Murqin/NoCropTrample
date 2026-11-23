@@ -17,8 +17,20 @@
   "screen.nocroptrample.option.fall_distance.blocks": "%s blok",
   "screen.nocroptrample.option.fall_distance.tooltip": "Bu mesafeden yüksek düşüşlerde tarla yine ezilir. Tam koruma için Sınırsız bırakın.",
   "screen.nocroptrample.button.reset": "Varsayılana Sıfırla",
+  "screen.nocroptrample.local.defaults_hint": "Yeni dünyalar için varsayılan ayarlar (aktif dünyalar oyun kurallarını kullanır).",
+  "screen.nocroptrample.local.world_hint": "Bu dünyanın oyun kuralları düzenleniyor.",
   "screen.nocroptrample.remote.readonly": "Sunucu ayarlarını buradan değiştiremezsiniz. Güncel sunucu ayarları gösteriliyor:",
-  "screen.nocroptrample.remote.command_hint": "Sunucu yetkilileri ayarları /nocroptrample komutuyla değiştirebilir.",
+  "screen.nocroptrample.remote.command_hint": "Sunucu yetkilileri ayarları /nocroptrample veya /gamerule ile değiştirebilir.",
   "screen.nocroptrample.remote.legacy": "Sunucu ayarlarını buradan değiştiremezsiniz. Bu sunucuda No Crop Trample'ın eski bir sürümü çalışıyor — ayarları görmek için sohbette /nocroptrample status yazın.",
-  "screen.nocroptrample.remote.not_installed": "Bu sunucuda No Crop Trample yüklü değil."
+  "screen.nocroptrample.remote.not_installed": "Bu sunucuda No Crop Trample yüklü değil.",
+  "gamerule.nocroptrample.prevent_empty_trampling": "Boş tarla ezilmesini engelle",
+  "gamerule.nocroptrample.prevent_empty_trampling.description": "Üzerinde ekin olmayan boş tarlaların ezilip toprağa dönüşmesini engeller.",
+  "gamerule.nocroptrample.prevent_player_trampling": "Oyuncu ekin ezmesini engelle",
+  "gamerule.nocroptrample.prevent_player_trampling.description": "Oyuncuların ve oyuncu kontrolündeki bineklerin ekili tarlayı ezmesini engeller.",
+  "gamerule.nocroptrample.prevent_mob_trampling": "Mob ekin ezmesini engelle",
+  "gamerule.nocroptrample.prevent_mob_trampling.description": "Mobların ekili tarlayı ezmesini engeller.",
+  "gamerule.nocroptrample.min_feather_falling_level": "Ekin koruması min. Tüy Düşüşü",
+  "gamerule.nocroptrample.min_feather_falling_level.description": "Oyuncu koruması için botta gereken minimum Tüy Düşüşü seviyesi (0 = kapalı).",
+  "gamerule.nocroptrample.max_safe_fall_distance": "Ekin koruması maks. güvenli düşüş",
+  "gamerule.nocroptrample.max_safe_fall_distance.description": "Tarlayı ezmeden düşülebilecek maksimum blok yüksekliği (0 = sınırsız)."
 }

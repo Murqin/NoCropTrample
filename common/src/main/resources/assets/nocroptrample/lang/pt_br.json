@@ -17,8 +17,20 @@
   "screen.nocroptrample.option.fall_distance.blocks": "%s blocos",
   "screen.nocroptrample.option.fall_distance.tooltip": "Quedas maiores que essa distância ainda pisoteiam a terra. Ilimitada protege sempre.",
   "screen.nocroptrample.button.reset": "Restaurar padrões",
+  "screen.nocroptrample.local.defaults_hint": "Configurações padrão para novos mundos (mundos ativos usam regras do jogo).",
+  "screen.nocroptrample.local.world_hint": "Editando as regras de jogo deste mundo.",
   "screen.nocroptrample.remote.readonly": "Você não pode alterar as configurações do servidor aqui. Exibindo configurações atuais do servidor:",
-  "screen.nocroptrample.remote.command_hint": "Operadores do servidor podem alterar as configurações com /nocroptrample.",
+  "screen.nocroptrample.remote.command_hint": "Operadores podem alterar as configurações com /nocroptrample ou /gamerule.",
   "screen.nocroptrample.remote.legacy": "Você não pode alterar as configurações do servidor aqui. Este servidor usa uma versão antiga do No Crop Trample — use /nocroptrample status no chat.",
-  "screen.nocroptrample.remote.not_installed": "Este servidor não tem o No Crop Trample instalado."
+  "screen.nocroptrample.remote.not_installed": "Este servidor não tem o No Crop Trample instalado.",
+  "gamerule.nocroptrample.prevent_empty_trampling": "Impedir pisoteio de terra vazia",
+  "gamerule.nocroptrample.prevent_empty_trampling.description": "Impede que terra arada sem plantação vire terra comum ao ser pisoteada.",
+  "gamerule.nocroptrample.prevent_player_trampling": "Impedir pisoteio de plantações por jogadores",
+  "gamerule.nocroptrample.prevent_player_trampling.description": "Impede que jogadores e montarias controladas por jogadores pisoteiem plantações.",
+  "gamerule.nocroptrample.prevent_mob_trampling": "Impedir pisoteio de plantações por mobs",
+  "gamerule.nocroptrample.prevent_mob_trampling.description": "Impede que mobs pisoteiem terra arada com plantações.",
+  "gamerule.nocroptrample.min_feather_falling_level": "Peso Pena mín. para plantações",
+  "gamerule.nocroptrample.min_feather_falling_level.description": "Nível mínimo de Peso Pena nas botas exigido para proteger jogadores (0 = desativado).",
+  "gamerule.nocroptrample.max_safe_fall_distance": "Queda segura máx. em plantações",
+  "gamerule.nocroptrample.max_safe_fall_distance.description": "Altura máxima de queda em blocos que permanece protegida (0 = ilimitada)."
 }

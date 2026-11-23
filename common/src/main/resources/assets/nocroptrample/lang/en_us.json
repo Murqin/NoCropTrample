@@ -17,8 +17,20 @@
   "screen.nocroptrample.option.fall_distance.blocks": "%s blocks",
   "screen.nocroptrample.option.fall_distance.tooltip": "Falls higher than this distance still trample farmland. Set to Unlimited for full protection.",
   "screen.nocroptrample.button.reset": "Reset Defaults",
+  "screen.nocroptrample.local.defaults_hint": "Default settings for new worlds (active worlds use game rules).",
+  "screen.nocroptrample.local.world_hint": "Editing this world's game rules.",
   "screen.nocroptrample.remote.readonly": "You cannot change server settings here. Showing current server settings:",
-  "screen.nocroptrample.remote.command_hint": "Server operators can change settings with /nocroptrample.",
+  "screen.nocroptrample.remote.command_hint": "Server operators can change settings with /nocroptrample or /gamerule.",
   "screen.nocroptrample.remote.legacy": "You cannot change server settings here. This server runs an older version of No Crop Trample — use /nocroptrample status in chat to view its settings.",
-  "screen.nocroptrample.remote.not_installed": "This server does not have No Crop Trample installed."
+  "screen.nocroptrample.remote.not_installed": "This server does not have No Crop Trample installed.",
+  "gamerule.nocroptrample.prevent_empty_trampling": "Prevent empty farmland trampling",
+  "gamerule.nocroptrample.prevent_empty_trampling.description": "Prevents unplanted farmland from reverting to dirt when trampled.",
+  "gamerule.nocroptrample.prevent_player_trampling": "Prevent player crop trampling",
+  "gamerule.nocroptrample.prevent_player_trampling.description": "Prevents players and player-controlled mounts from trampling planted farmland.",
+  "gamerule.nocroptrample.prevent_mob_trampling": "Prevent mob crop trampling",
+  "gamerule.nocroptrample.prevent_mob_trampling.description": "Prevents mobs from trampling planted farmland.",
+  "gamerule.nocroptrample.min_feather_falling_level": "Crop trample min Feather Falling",
+  "gamerule.nocroptrample.min_feather_falling_level.description": "Minimum Feather Falling boot level required for player trampling protection (0 = disabled).",
+  "gamerule.nocroptrample.max_safe_fall_distance": "Crop trample max safe fall distance",
+  "gamerule.nocroptrample.max_safe_fall_distance.description": "Maximum fall height in blocks that stays protected from trampling (0 = unlimited)."
 }

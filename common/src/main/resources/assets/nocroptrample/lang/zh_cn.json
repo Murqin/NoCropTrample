@@ -17,8 +17,20 @@
   "screen.nocroptrample.option.fall_distance.blocks": "%s 格",
   "screen.nocroptrample.option.fall_distance.tooltip": "从高于此距离处落下仍会踩坏耕地。设为“无限制”可完全保护。",
   "screen.nocroptrample.button.reset": "恢复默认",
+  "screen.nocroptrample.local.defaults_hint": "新建世界的默认设置（当前世界使用游戏规则）。",
+  "screen.nocroptrample.local.world_hint": "正在编辑当前世界的游戏规则。",
   "screen.nocroptrample.remote.readonly": "你无法在此处修改服务器设置。当前服务器设置如下：",
-  "screen.nocroptrample.remote.command_hint": "服务器管理员可使用 /nocroptrample 修改设置。",
+  "screen.nocroptrample.remote.command_hint": "服务器管理员可使用 /nocroptrample 或 /gamerule 修改设置。",
   "screen.nocroptrample.remote.legacy": "你无法在此处修改服务器设置。该服务器运行的是旧版 No Crop Trample — 请在聊天栏输入 /nocroptrample status 查看设置。",
-  "screen.nocroptrample.remote.not_installed": "此服务器未安装 No Crop Trample。"
+  "screen.nocroptrample.remote.not_installed": "此服务器未安装 No Crop Trample。",
+  "gamerule.nocroptrample.prevent_empty_trampling": "阻止踩踏空耕地",
+  "gamerule.nocroptrample.prevent_empty_trampling.description": "阻止未种植作物的空耕地被踩踏变成泥土。",
+  "gamerule.nocroptrample.prevent_player_trampling": "阻止玩家踩踏作物",
+  "gamerule.nocroptrample.prevent_player_trampling.description": "阻止玩家及玩家控制的坐骑踩踏已种植的耕地。",
+  "gamerule.nocroptrample.prevent_mob_trampling": "阻止生物踩踏作物",
+  "gamerule.nocroptrample.prevent_mob_trampling.description": "阻止生物踩踏已种植的耕地。",
+  "gamerule.nocroptrample.min_feather_falling_level": "耕地保护最低摔落缓冲",
+  "gamerule.nocroptrample.min_feather_falling_level.description": "玩家保护所需的靴子最低摔落缓冲等级（0 = 关闭）。",
+  "gamerule.nocroptrample.max_safe_fall_distance": "耕地保护最大安全摔落高度",
+  "gamerule.nocroptrample.max_safe_fall_distance.description": "仍受踩踏保护的最大摔落格数（0 = 无限制）。"
 }

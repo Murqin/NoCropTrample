@@ -17,7 +17,7 @@ public record SyncConfigPayload(
         boolean preventPlayerTrampling,
         boolean preventMobTrampling,
         int minFeatherFallingLevel,
-        double maxSafeFallDistance
+        int maxSafeFallDistance
 ) implements CustomPacketPayload {
 
     public static final CustomPacketPayload.Type<SyncConfigPayload> TYPE =
@@ -28,7 +28,7 @@ public record SyncConfigPayload(
             ByteBufCodecs.BOOL, SyncConfigPayload::preventPlayerTrampling,
             ByteBufCodecs.BOOL, SyncConfigPayload::preventMobTrampling,
             ByteBufCodecs.VAR_INT, SyncConfigPayload::minFeatherFallingLevel,
-            ByteBufCodecs.DOUBLE, SyncConfigPayload::maxSafeFallDistance,
+            ByteBufCodecs.VAR_INT, SyncConfigPayload::maxSafeFallDistance,
             SyncConfigPayload::new);
 
     public static SyncConfigPayload from(ConfigSnapshot snapshot) {
