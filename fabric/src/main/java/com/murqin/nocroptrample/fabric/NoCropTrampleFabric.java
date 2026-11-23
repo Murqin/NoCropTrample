@@ -44,12 +44,15 @@ public class NoCropTrampleFabric implements ModInitializer {
 
         PayloadTypeRegistry.clientboundPlay().register(SyncConfigPayload.TYPE, SyncConfigPayload.STREAM_CODEC);
 
-        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) ->
-                sendIfSupported(handler.getPlayer(), SyncConfigPayload.from(ModGameRules.snapshot(server.getGameRules()))));
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+            if (ServerPlayNetworking.canSend(handler, SyncConfigPayload.TYPE)) {
+                sender.sendPacket(SyncConfigPayload.from(ModGameRules.snapshot(server.getGameRules())));
+            }
+        });
 
         ClientboundPlayChannelEvents.REGISTER.register((handler, sender, server, channels) -> {
             if (channels.contains(SyncConfigPayload.TYPE.id())) {
-                sendIfSupported(handler.getPlayer(), SyncConfigPayload.from(ModGameRules.snapshot(server.getGameRules())));
+                sender.sendPacket(SyncConfigPayload.from(ModGameRules.snapshot(server.getGameRules())));
             }
         });
 
@@ -84,7 +87,7 @@ public class NoCropTrampleFabric implements ModInitializer {
     }
 
     private static void sendIfSupported(ServerPlayer player, SyncConfigPayload payload) {
-        if (ServerPlayNetworking.canSend(player, SyncConfigPayload.TYPE)) {
+        if (player != null && player.connection != null && ServerPlayNetworking.canSend(player, SyncConfigPayload.TYPE)) {
             ServerPlayNetworking.send(player, payload);
         }
     }

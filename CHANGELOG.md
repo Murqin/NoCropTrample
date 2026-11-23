@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.7-26.3] - 2026-11-23
+
+### New Features
+- **Per-world GameRules** — added five native `nocroptrample:*` GameRules (`prevent_empty_trampling`, `prevent_player_trampling`, `prevent_mob_trampling`, `min_feather_falling_level`, `max_safe_fall_distance`) saved per world in `level.dat`, while `config/nocroptrample.json` stores defaults for new worlds and `/nocroptrample reload`.
+- **Same-session Create World seeding** — editing defaults on the Title Screen immediately seeds newly opened `CreateWorldScreen` worlds via `CreateWorldDefaultsHelper` without needing a restart.
+- **Survival balance options** — added `minFeatherFallingLevel` (`0–4`) and integer `maxSafeFallDistance` (`0–100` blocks, `0` = unlimited, with `15/16` farmland depth tolerance).
+- **Mounted player support** — entities with a controlling player (`entity.getControllingPassenger() instanceof Player`) now follow player rules, including the Feather Falling check.
+- **Datapack tags** — added `#nocroptrample:protected_crops` (includes `minecraft:torchflower` by default), `#nocroptrample:trample_exempt_entities`, and `#nocroptrample:always_trample_entities`.
+- **Optional config sync & localized Config Screen** — added optional one-way S2C `nocroptrample:sync_config` payload (read-only live view on multiplayer servers, notice on legacy/unmodded servers) and localized all UI + GameRule entries across 10 languages (`en_us`, `tr_tr`, `de_de`, `es_es`, `fr_fr`, `pt_br`, `ru_ru`, `zh_cn`, `ja_jp`, `ko_kr`).
+
+### Improvements & Bug Fixes
+- **Command upgrades** — added `/nocroptrample featherfalling [0-4]`, `/nocroptrample falldistance [0-100]`, `/nocroptrample reset`, clickable toggle/step controls for player OPs in `/nocroptrample status`, `Permissions.COMMANDS_GAMEMASTER` gating, prefix-filtered tab suggestions via `SharedSuggestionProvider`, and non-destructive `/nocroptrample reload` when JSON fails to parse.
+- **Config safety & atomic writes** — guarded `ModConfig` with `IO_LOCK`, volatile snapshots, atomic temp-file swap moves, no-op write skipping, overflow-safe `Math.clamp(long, int, int)`, and safe handling of malformed/non-numeric fall distance strings.
+- **UI & slider polish** — fixed `FallDistanceSlider` writing on every drag pixel (now commits on release, blur/confirm, or screen close; supports `0–100` with keyboard `±1` arrow stepping), prevented keyboard-edited slider resets from restoring stale values, added async singleplayer GameRule sync without render-thread races, and compacted small-viewport layouts.
+- **Networking hardening** — fixed an NPE inside Fabric `ClientboundPlayChannelEvents.REGISTER` by replying via `PacketSender#sendPacket`, coalesced multi-rule updates to one broadcast per server tick (`END_SERVER_TICK` / `ServerTickEvent.Post`), and added session-generation guards + proxy reconfiguration clearing on clients.
+
+### Technical
+- Short-circuited hot-path checks in `TrampleRules#shouldPreventTrampling` to skip block/crop and enchantment lookups when earlier conditions decide the outcome.
+- Expanded `TrampleRulesTest` and `ResourcesValidationTest` covering tags, language key/placeholder parity across all 10 locales, integer overflow, malformed reload preservation, no-op save skipping, and atomic writes.
+
 ## [1.6-26.3] - 2026-09-16
 
 ### New Features
